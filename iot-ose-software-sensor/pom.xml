@@ -1,0 +1,66 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.redhat.demo.iot</groupId>
+  <artifactId>iot-ose-software-sensor</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  
+    <properties>
+    <!-- Explicitly declaring the source encoding eliminates the following message: -->
+    <!-- [WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent! -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- maven-compiler-plugin -->
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+  </properties>
+  
+  <dependencies>
+     	<dependency>
+    <groupId>org.eclipse.paho</groupId>
+    <artifactId>mqtt-client</artifactId>
+    <version>0.4.0</version>
+  </dependency>
+  
+  </dependencies>
+  
+    <repositories>
+  <repository>
+    <id>paho-mqtt-client</id>
+    <name>Paho MQTT Client</name>
+    <url>https://repo.eclipse.org/content/repositories/paho-releases/</url>
+  </repository>
+</repositories>
+
+  <build>
+  	<finalName>iot-ose-software-sensor</finalName>
+      <plugins>
+      	<plugin>
+		    <artifactId>maven-assembly-plugin</artifactId>
+		    <executions>
+		      <execution>
+		        <phase>package</phase>
+		        <goals>
+		          <goal>single</goal>
+		        </goals>
+		      </execution>
+		    </executions>
+		    <configuration>
+		
+		      <archive>
+			      <manifest>
+				        <addClasspath>true</addClasspath>
+				        <mainClass>com.redhat.demo.MqttTester</mainClass>
+			      </manifest>
+		      </archive>
+		
+		      <descriptorRefs>
+		        <descriptorRef>jar-with-dependencies</descriptorRef>
+		      </descriptorRefs>
+		
+		    </configuration>
+		 </plugin> 
+      </plugins>
+  </build>
+
+  
+  
+</project>

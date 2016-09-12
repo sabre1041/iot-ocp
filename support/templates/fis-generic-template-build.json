@@ -1,0 +1,297 @@
+{
+  "apiVersion": "v1",
+  "kind": "Template",
+  "labels": {},
+  "metadata": {
+    "annotations": {
+      "description": "FIS Generic Template",
+      "iconClass": "icon-java"
+    },
+    "labels": {},
+    "name": "fis-generic-build"
+  },
+  "parameters": [
+    {
+      "name": "APP_NAME",
+      "value": "fis-app",
+      "description": "Application Name"
+    },
+    {
+      "name": "GIT_REPO",
+      "required": true,
+      "value": "https://github.com/sabre1041/iot-ose.git",
+      "description": "Git repository, required"
+    },
+    {
+      "name": "GIT_REF",
+      "value": "master",
+      "description": "Git ref to build"
+    },
+    {
+      "name": "GIT_CONTEXT_DIR",
+      "value": "iot-ose-routing-service",
+      "description": "Git context directory"
+    },
+    {
+      "name": "BUILDER_VERSION",
+      "value": "1.0",
+      "description": "Builder version"
+    },
+    {
+      "name": "MAVEN_ARGS",
+      "value": "clean install -DskipTests",
+      "description": "Arguments passed to mvn in the build"
+    },
+    {
+      "name": "MAVEN_ARGS_APPEND",
+      "description": "Extra arguments passed to mvn, e.g. for multi-module builds"
+    },
+    {
+      "name": "ARTIFACT_DIR",
+      "description": "Directory containing build artifacts."
+    },
+    {
+      "description": "Namespace in which the Fuse ImageStreams are installed. These ImageStreams are normally installed in the openshift namespace. You should only need to modify this if you've installed the ImageStreams in a different namespace/project.",
+      "name": "IMAGE_STREAM_NAMESPACE",
+      "value": "openshift",
+      "required": true
+    },
+    {
+        "description": "The user name to access the KIE Server.",
+        "name": "KIE_APP_USER",
+        "value": "kieserver",
+        "required": false
+    },
+    {
+        "description": "The password to access the KIE Server REST. Must be different than username; must not be root, admin, or administrator; must contain at least 8 characters, 1 alphabetic character(s), 1 digit(s), and 1 non-alphanumeric symbol(s).",
+        "name": "KIE_APP_PASSWORD",
+        "from": "[a-zA-Z]{6}[0-9]{1}!",
+        "generate": "expression",
+        "required": false
+    },
+    {
+        "description": "The user name to access the AMQ Server.",
+        "name": "BROKER_AMQ_USERNAME",
+        "value": "kieserver",
+        "required": false
+    },
+    {
+        "description": "The password to access the AMQ awecwe. Must be different than username; must not be root, admin, or administrator; must contain at least 8 characters, 1 alphabetic character(s), 1 digit(s), and 1 non-alphanumeric symbol(s).",
+        "name": "BROKER_AMQ_PASSWORD",
+        "from": "[a-zA-Z]{6}[0-9]{1}!",
+        "generate": "expression",
+        "required": false
+    }
+  ],
+  "objects": [
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "annotations": {
+        },
+        "labels": {
+          "container": "karaf",
+          "component": "${APP_NAME}"
+        },
+        "name": "${APP_NAME}"
+      },
+      "spec": {
+        "clusterIP": "None",
+        "deprecatedPublicIPs": [],
+        "ports": [
+          {
+            "port": 9412,
+            "protocol": "TCP",
+            "targetPort": 8181
+          }
+        ],
+        "selector": {
+          "container": "karaf",
+          "component": "${APP_NAME}"
+        }
+      }
+    },
+    {
+      "kind": "ImageStream",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "${APP_NAME}",
+        "creationTimestamp": null,
+        "labels": {
+          "component": "${APP_NAME}",
+          "container": "karaf"
+        }
+      },
+      "spec": {},
+      "status": {
+        "dockerImageRepository": ""
+      }
+    },
+    {
+      "kind": "BuildConfig",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "${APP_NAME}",
+        "creationTimestamp": null,
+        "labels": {
+          "component": "${APP_NAME}",
+          "container": "karaf"
+        }
+      },
+      "spec": {
+        "triggers": [
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "ImageChange",
+            "imageChange": {}
+          }
+        ],
+        "source": {
+          "type": "Git",
+          "git": {
+            "uri": "${GIT_REPO}",
+            "ref": "${GIT_REF}"
+          },
+          "contextDir": "${GIT_CONTEXT_DIR}"
+        },
+        "strategy": {
+          "type": "Source",
+          "sourceStrategy": {
+            "from": {
+              "kind": "ImageStreamTag",
+              "namespace": "${IMAGE_STREAM_NAMESPACE}",
+              "name": "fis-karaf-openshift:${BUILDER_VERSION}"
+            },
+            "forcePull": true,
+            "env": [
+              {
+                "name": "ARTIFACT_DIR",
+                "value": "${ARTIFACT_DIR}"
+              },
+              {
+                "name": "MAVEN_ARGS",
+                "value": "${MAVEN_ARGS}"
+              },
+              {
+                "name": "MAVEN_ARGS_APPEND",
+                "value": "${MAVEN_ARGS_APPEND}"
+              }
+            ]
+          }
+        },
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "${APP_NAME}:latest"
+          }
+        },
+        "resources": {}
+      },
+      "status": {
+        "lastVersion": 0
+      }
+    },
+    {
+      "kind": "DeploymentConfig",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "${APP_NAME}",
+        "creationTimestamp": null,
+        "labels": {
+          "component": "${APP_NAME}",
+          "container": "karaf"
+        }
+      },
+      "spec": {
+        "strategy": {
+          "resources": {}
+        },
+        "triggers": [
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "ImageChange",
+            "imageChangeParams": {
+              "automatic": true,
+              "containerNames": [
+                "${APP_NAME}"
+              ],
+              "from": {
+                "kind": "ImageStreamTag",
+                "name": "${APP_NAME}:latest"
+              }
+            }
+          }
+        ],
+        "replicas": 1,
+        "selector": {
+          "component": "${APP_NAME}",
+          "container": "karaf",
+          "deploymentconfig": "${APP_NAME}"
+        },
+        "template": {
+          "metadata": {
+            "creationTimestamp": null,
+            "labels": {
+              "component": "${APP_NAME}",
+              "container": "karaf",
+              "deploymentconfig": "${APP_NAME}"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "name": "${APP_NAME}",
+                "image": "${APP_NAME}",
+                "readinessProbe": {
+                  "exec": {
+                    "command": [
+                      "/bin/bash",
+                      "-c",
+                      "(curl -f 127.0.0.1:8778) >/dev/null 2>&1; test $? != 7"
+                    ]
+                  },
+                  "initialDelaySeconds": 30,
+                  "timeoutSeconds": 5
+                },
+                "ports": [
+                  {
+                    "containerPort": 8181,
+                    "name": "http"
+                  },
+                  {
+                    "containerPort": 8778,
+                    "name": "jolokia"
+                  }
+                ],
+                "env": [
+                  {
+                      "name": "KIE_APP_USER",
+                      "value": "${KIE_APP_USER}"
+                  },
+                  {
+                      "name": "KIE_APP_PASSWORD",
+                      "value": "${KIE_APP_PASSWORD}"
+                  },
+                  {
+                      "name": "BROKER_AMQ_USERNAME",
+                      "value": "${BROKER_AMQ_USERNAME}"
+                  },
+                  {
+                      "name": "BROKER_AMQ_PASSWORD",
+                      "value": "${BROKER_AMQ_PASSWORD}"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "status": {}
+    }
+  ]
+}
