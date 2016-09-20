@@ -1,4 +1,4 @@
-package com.redhat.demo;
+package com.redhat.demo.iot.mqtt;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;

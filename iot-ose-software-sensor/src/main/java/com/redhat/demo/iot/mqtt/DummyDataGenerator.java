@@ -1,4 +1,4 @@
-package com.redhat.demo;
+package com.redhat.demo.iot.mqtt;
 
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;

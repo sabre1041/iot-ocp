@@ -1,4 +1,6 @@
-package com.redhat.demo;
+package com.redhat.demo.iot.mqtt;
+
+import javax.annotation.PreDestroy;
 
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -7,16 +9,35 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.redhat.demo.iot.ScheduledAction;
 
 public class MqttProducer {
 
-	MqttClient client;
-	MqttConnectOptions options;
-	MemoryPersistence persistence;
+	private MqttClient client;
+	private MqttConnectOptions options;
+	private MemoryPersistence persistence;
+	
+	private final String brokerURL;
+	private final String user;
+	private final String password;
+	private final String queueName;
+	
+    private static final Logger log = LoggerFactory.getLogger(ScheduledAction.class);
+
 	
 	public MqttProducer(String brokerURL, String user, String password, String queueName) {
 	
-		// MemoryPersistence persistence = new MemoryPersistence();
+		this.brokerURL = brokerURL;
+		this.user = user;
+		this.password = password;
+		this.queueName = queueName;
+		
+	}
+	
+	public void connect() throws MqttSecurityException, MqttException {
 		
 		try {
 			client = new MqttClient(brokerURL, "mqtt.temp.receiver");
@@ -29,15 +50,7 @@ public class MqttProducer {
 		options.setUserName(user);
 		options.setPassword(password.toCharArray());
 		
-		try {
-			client.connect(options);
-		} catch (MqttSecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MqttException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace(System.out);
-		}
+		client.connect(options);
 		
 	}
 	
@@ -51,10 +64,10 @@ public class MqttProducer {
 		
 	}
 	
+	@PreDestroy
 	public void close() throws MqttException{
-		
-		client.disconnect();
-		client.close();
+		try { client.disconnect(); } catch(Exception e) {}
+		try { client.close(); } catch(Exception e) {}
 		
 	}
 }

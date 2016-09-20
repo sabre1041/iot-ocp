@@ -53,6 +53,10 @@ echo "Deploying FIS Application..."
 echo
 oc process -v=KIE_APP_USER="${KIE_USER}",KIE_APP_PASSWORD="${KIE_PASSWORD}",BROKER_AMQ_USERNAME="${MQ_USER}",BROKER_AMQ_PASSWORD="${MQ_PASSWORD}",IMAGE_STREAM_NAMESPACE=${IOT_OSE_PROJECT} -f ${SCRIPT_BASE_DIR}/support/templates/fis-generic-template-build.json | oc create -n ${IOT_OSE_PROJECT} -f-
 
+echo
+echo "Deploying Software Sensor Application..."
+echo
+oc process -v=MQTT_USERNAME="${MQ_USER}",MQTT_PASSWORD="${MQ_PASSWORD}" -f ${SCRIPT_BASE_DIR}/support/templates/software-sensor-template.json | oc create -n ${IOT_OSE_PROJECT} -f-
 
 echo
 echo "OpenShift IoT Demo Setup Complete."

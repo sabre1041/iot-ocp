@@ -72,7 +72,7 @@
     {
         "description": "The user name to access the AMQ Server.",
         "name": "BROKER_AMQ_USERNAME",
-        "value": "kieserver",
+        "value": "iotuser",
         "required": false
     },
     {

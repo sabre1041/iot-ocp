@@ -1,4 +1,4 @@
-package com.redhat.demo;
+package com.redhat.demo.iot.mqtt;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
@@ -18,7 +18,7 @@ public class MqttTester {
     private static final String DEFAULT_HIGHWATER_MARK 	= "800";
     private static final String DEFAULT_LOWWATER_MARK 	= "200";
     
-    
+    /*
     public static void main(String args[]) throws MqttPersistenceException, MqttException, InterruptedException {
     	DummyDataGenerator dummy = new DummyDataGenerator();
     	MqttProducer		   producer;
@@ -56,5 +56,6 @@ public class MqttTester {
         producer.close();
 
     }
+    */
 
 }
