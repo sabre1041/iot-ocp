@@ -12,15 +12,40 @@ import org.apache.camel.Handler;
 
 public class MyHelper {
 	
+	private int TOPIC_PART_SIZE = 3;
+	private static final String TOPIC_SEPARTOR = "/";
+	private static final String COMMA = ",";
+	
+    private static final ThreadLocal<SimpleDateFormat> dateFormat = new ThreadLocal<SimpleDateFormat>(){
+        @Override
+        protected SimpleDateFormat initialValue()
+        {
+            return new SimpleDateFormat("dd.MM.yyy HH:mm:ss SSS");
+        }
+    };
+	
 	@Handler
 	public String enhanceMessage( String body,  Exchange exchange  ) {
 		String res = null;
 		
-		res = addDeviceID(body, exchange);
-		res = addDeviceType(res, exchange);
-		res = appendTimestamp(res, exchange);
+		String[] topicParts = exchange.getIn().getHeader("CamelMQTTSubscribeTopic", String.class).split(TOPIC_SEPARTOR);
 
-		return res;
+		if(topicParts.length != 4) {
+			throw new IllegalArgumentException("Invalid number of topic components. Expected " + TOPIC_PART_SIZE + ". Was " + topicParts.length);
+		}
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append(body);
+		sb.append(COMMA);
+		sb.append(topicParts[1]);
+		sb.append(COMMA);
+		sb.append(topicParts[2]);
+		sb.append(COMMA);
+		sb.append(topicParts[3]);
+		sb.append(COMMA);
+		sb.append(dateFormat.get().format(new Date()));
+		
+		return sb.toString();
 	}
    
     @Handler
@@ -34,54 +59,5 @@ public class MyHelper {
         return body;
        
     }
-
-   
-    @Handler
-    public String addDeviceType(String body, Exchange exchange) {
-       
-        String result=null;
-       
-        Pattern pattern = Pattern.compile("(?<=\\/)(.*?)(?=\\/)");
-        Matcher matcher = pattern.matcher((String)exchange.getIn().getHeader("CamelMQTTSubscribeTopic"));
-        if (matcher.find())
-        {
-            result = matcher.group(0);
-        }
-       
-        return result + ", " + body;
-       
-    }
-   
-
-    @Handler
-    public String addDeviceID(String body,  Exchange exchange) {
-       
-        String result=null;
-       
-        Pattern pattern = Pattern.compile("([^\\/]*)$");
-        Matcher matcher = pattern.matcher((String)exchange.getIn().getHeader("CamelMQTTSubscribeTopic"));
-        if (matcher.find())
-        {
-            result = matcher.group(0);
-        }
-             
-        return result + ", " + body;
-    }
-    
-
-    public com.redhat.demo.businessRules.DataSet transform(@Body DataSet dataSet) {
-       
-    	com.redhat.demo.businessRules.DataSet businessDataSet = new com.redhat.demo.businessRules.DataSet();
-    	businessDataSet.setAverage(dataSet.getAverage());
-    	businessDataSet.setDeviceID(Integer.parseInt(dataSet.getDeviceID().trim()));
-    	businessDataSet.setDeviceType(dataSet.getDeviceType());
-    	businessDataSet.setPayload(Integer.parseInt(dataSet.getPayload().trim()));
-    	businessDataSet.setRequired(dataSet.getRequired());
-    	businessDataSet.setTimestamp(dataSet.getTimestamp());
-    	
-    	return businessDataSet;
-    	
-    }
-
 }
 

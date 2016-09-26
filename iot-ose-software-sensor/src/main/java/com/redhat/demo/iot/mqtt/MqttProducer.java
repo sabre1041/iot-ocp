@@ -12,8 +12,6 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.redhat.demo.iot.ScheduledAction;
-
 public class MqttProducer {
 
 	private MqttClient client;
@@ -23,45 +21,48 @@ public class MqttProducer {
 	private final String brokerURL;
 	private final String user;
 	private final String password;
-	private final String queueName;
+	private final String appName;
+
+	private static final int QOS = 2;
 	
-    private static final Logger log = LoggerFactory.getLogger(ScheduledAction.class);
+    private static final Logger log = LoggerFactory.getLogger(MqttProducer.class);
 
 	
-	public MqttProducer(String brokerURL, String user, String password, String queueName) {
+	public MqttProducer(String brokerURL, String user, String password, String appName) {
 	
 		this.brokerURL = brokerURL;
 		this.user = user;
 		this.password = password;
-		this.queueName = queueName;
+		this.appName = appName;
 		
 	}
 	
-	public void connect() throws MqttSecurityException, MqttException {
+	public synchronized void connect() {
 		
-		try {
-			client = new MqttClient(brokerURL, "mqtt.temp.receiver");
-		} catch (MqttException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace(System.out);
+		if(client != null && client.isConnected()) {
+			return;
 		}
 		
-		options = new MqttConnectOptions ();
-		options.setUserName(user);
-		options.setPassword(password.toCharArray());
-		
-		client.connect(options);
+		try {
+			client = new MqttClient(brokerURL, appName);
+			options = new MqttConnectOptions ();
+			options.setUserName(user);
+			options.setPassword(password.toCharArray());
+			client.connect(options);
+		}catch(MqttException e) {
+			log.error(e.getMessage(), e);
+		}
 		
 	}
 	
-	public void run(String data, String deviceType, String deviceID) throws MqttPersistenceException, MqttException {
+	public void run(String topic, String data) throws MqttPersistenceException, MqttException {
 		
 		MqttMessage message = new MqttMessage();
+		message.setQos(QOS);
 		
 		message.setPayload(data.getBytes());
-		
-		client.publish("iotdemo/"+deviceType+"/"+deviceID, message);
-		
+		client.publish(topic, message);
+				
 	}
 	
 	@PreDestroy

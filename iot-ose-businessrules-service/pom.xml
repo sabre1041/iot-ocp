@@ -13,4 +13,32 @@
     <maven.compiler.source>1.8</maven.compiler.source>
   </properties>
   
+  <dependencies>
+  		<dependency>
+			<groupId>org.drools</groupId>
+			<artifactId>drools-compiler</artifactId>
+			<version>6.3.0.Final-redhat-9</version>
+			<scope>provided</scope>
+		</dependency>
+  		<dependency>
+			<groupId>org.drools</groupId>
+			<artifactId>drools-decisiontables</artifactId>
+			<version>6.3.0.Final-redhat-9</version>
+			<scope>provided</scope>
+		</dependency>
+  		<dependency>
+  			<groupId>junit</groupId>
+  			<artifactId>junit</artifactId>
+  			<version>4.12</version>
+  			<scope>test</scope>
+  		</dependency>
+ 		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.3</version>
+			<scope>test</scope>
+		</dependency>
+ 
+  </dependencies>
+  
 </project>

@@ -222,6 +222,15 @@
 		                                }
 		                            },
 		                            {
+		                                "name": "DEVICE_ID",
+		                                "valueFrom": {
+		                                    "fieldRef": {
+		                                        "apiVersion": "v1",
+		                                        "fieldPath": "metadata.name"
+		                                    }
+		                                }
+		                            },
+		                            {
 		                                "name": "MQTT_SERVICE",
 		                                "value": "broker-amq-mqtt"
 		                            },

@@ -29,12 +29,13 @@
 
   <camelContext xmlns="http://camel.apache.org/schema/spring">
   <dataFormats>
-    <bindy type="Csv" classType="com.redhat.demo.iotdemo.routingService.DataSet" id="bindyDataFormat"/>
+    <bindy type="Csv" classType="com.redhat.demo.iotdemo.routingService.Measure" id="bindyDataFormat"/>
   </dataFormats>
   <route id="messagesFromSensor">
-  <from uri="mqtt:mqtt.temp.receiver?host=tcp://{{env:BROKER_AMQ_MQTT_SERVICE_HOST}}:{{env:BROKER_AMQ_MQTT_SERVICE_PORT}}&amp;subscribeTopicNames=iotdemo/#/#&amp;userName={{env:BROKER_AMQ_USERNAME}}&amp;password={{env:BROKER_AMQ_PASSWORD}}"/>
+  <from uri="mqtt:mqtt.temp.receiver?host=tcp://{{env:BROKER_AMQ_MQTT_SERVICE_HOST}}:{{env:BROKER_AMQ_MQTT_SERVICE_PORT}}&amp;subscribeTopicNames=iot-ose/#/#/#&amp;userName={{env:BROKER_AMQ_USERNAME}}&amp;password={{env:BROKER_AMQ_PASSWORD}}"/>
     <bean ref="myHelper" method="enhanceMessage" beanType="com.redhat.demo.routingService.MyHelper"/>
     <unmarshal ref="bindyDataFormat"/>
+    <log message="Mesaure of type ${body.dataType} received with value ${body.payload}"/>
     <convertBodyTo type="java.lang.String"/>
     <to uri="activemqGateway:queue:message.to.rules"/>
   </route>
@@ -42,13 +43,16 @@
 
   <route id="processRules">
   <from uri="activemqGateway:queue:message.to.rules"/>
-  <bean ref="myHelper" method="transform"/>
+  <!-- bean ref="myHelper" method="transform"/-->
   <bean ref="rules" method="processRules"/>
   <choice>
   	<when>
   		<simple>${body.errorCode} == 0</simple>
   	    <to uri="activemqGateway:queue:message.to.datacenter"/>
   	</when>
+  	<otherwise>
+  		<log message="${body.dataType} Exceeds Threashold: ${body.errorMessage}"/>
+  	</otherwise>
   </choice>
   </route>
   

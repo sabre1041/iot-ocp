@@ -19,8 +19,6 @@ import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.RuleServicesClient;
 
-import com.redhat.demo.businessRules.DataSet;
-
 public class BusinessRulesBean {
 	
 	private String kieHost;
@@ -29,14 +27,14 @@ public class BusinessRulesBean {
 	
 	private static final String SERVICE_CONTEXT = "kie-server/services/rest/server";
 	
-	public com.redhat.demo.businessRules.DataSet processRules(@Body com.redhat.demo.businessRules.DataSet dataSet) {
+	public Measure processRules(@Body Measure measure) {
 		
 		KieServicesConfiguration config = KieServicesFactory.newRestConfiguration(
 				kieHost, kieUser,
 				kiePassword);
 		
 		Set<Class<?>> jaxBClasses = new HashSet<Class<?>>();
-		jaxBClasses.add(DataSet.class);
+		jaxBClasses.add(Measure.class);
 		
 		config.addJaxbClasses(jaxBClasses);
 		config.setMarshallingFormat(MarshallingFormat.JAXB);
@@ -45,7 +43,7 @@ public class BusinessRulesBean {
 
         List<Command<?>> cmds = new ArrayList<Command<?>>();
 		KieCommands commands = KieServices.Factory.get().getCommands();
-		cmds.add(commands.newInsert(dataSet));
+		cmds.add(commands.newInsert(measure));
 		
 	    GetObjectsCommand getObjectsCommand = new GetObjectsCommand();
 	    getObjectsCommand.setOutIdentifier("objects");
@@ -59,9 +57,9 @@ public class BusinessRulesBean {
 				
 		List responseList = (List) response.getResult().getValue("objects");
 		
-		com.redhat.demo.businessRules.DataSet responseDataSet = (com.redhat.demo.businessRules.DataSet) responseList.get(0);
+		Measure responseMeasure = (Measure) responseList.get(0);
 		
-		return responseDataSet;
+		return responseMeasure;
 
 	}
 	
