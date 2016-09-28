@@ -4,12 +4,12 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import com.redhat.demo.iot.model.Measure;
 
-@Component(SensorType.COUNTDOWN)
+//@Component(SensorType.COUNTDOWN)
 @Scope("prototype")
+@Deprecated
 public class CountdownSensor implements Sensor {
 	
 	@Value("${sensor.countdown.enabled}") 
@@ -65,6 +65,13 @@ public class CountdownSensor implements Sensor {
 		
 		++count;
 		return measure;
+	}
+
+
+	@Override
+	public void initAndReset() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	

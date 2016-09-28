@@ -7,12 +7,12 @@ import org.junit.Test;
 public class SensorRulesTest extends BaseTest {
 	    
     @Test
-    public void organTemperatureTooLow() {
+    public void organTemperatureTooHigh() {
     	
     	Measure measure = new Measure();
     	measure.setDataType("temperature");
     	measure.setCategory("Organ");
-    	measure.setPayload("0");
+    	measure.setPayload("105");
     	    	
     	executeRules(measure);
     	

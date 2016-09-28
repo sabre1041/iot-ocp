@@ -30,7 +30,7 @@ public class GpsSensor implements Sensor {
 	@Value("${sensor.gps.iterationLongitude}")
 	private double iterationLongitude;
 	
-	@Value("${sensor.gps.finalLongitude}")
+	@Value("${sensor.gps.finalLatitude}")
 	private double finalLatitude;
 	
 	@Value("${sensor.gps.finalLongitude}")
@@ -42,7 +42,8 @@ public class GpsSensor implements Sensor {
 	private int count = 0;
 	
 	@PostConstruct
-	public void init() {
+	@Override
+	public void initAndReset() {
 		currentLongitude = initialLongitude;
 		currentLatitude = initialLatitude;
 	}
@@ -66,17 +67,12 @@ public class GpsSensor implements Sensor {
 	public Measure calculateCurrentMeasure(Measure measure) {
 		
 		if(count > 0) {
-			
-			//TODO: Need better logic when determining final values
-			
+						
 			currentLatitude = currentLatitude + iterationLatitude;
 			currentLongitude = currentLongitude + iterationLongitude;
 			
-			if(currentLatitude <= finalLatitude) {
-				currentLatitude = finalLatitude;
-			}
-			if(currentLongitude <= finalLongitude) {
-				currentLongitude = finalLongitude;
+			if(currentLatitude <= finalLatitude && currentLongitude <= finalLongitude) {
+				initAndReset();
 			}
 			
 		}
@@ -86,7 +82,6 @@ public class GpsSensor implements Sensor {
 		measure.setType(getType());
 		measure.setPayload(String.valueOf(payload));
 
-		
 		++count;
 		
 		return measure;

@@ -27,8 +27,12 @@ public class TemperatureSensor implements Sensor {
 	private int startMax;
 
 	
-	@Value("${sensor.temperature.iteration}") 
-	private float iteration;
+	@Value("${sensor.temperature.minIteration}") 
+	private int minIteration;
+	
+	@Value("${sensor.temperature.maxIteration}") 
+	private int maxIteration;
+
 		
 	@Value("${sensor.temperature.minRange}") 
 	private int minRange;
@@ -36,12 +40,13 @@ public class TemperatureSensor implements Sensor {
 	@Value("${sensor.temperature.maxRange}") 
 	private int maxRange;
 	
-	public float currentValue;
+	public int currentValue;
 	
 	public int count = 0;
 	
 	@PostConstruct
-	public void init() {
+	@Override
+	public void initAndReset() {
 		currentValue = ThreadLocalRandom.current().nextInt(startMin, (startMax+1));
 	}
 	
@@ -67,26 +72,19 @@ public class TemperatureSensor implements Sensor {
 		
 		if(count > 0) {
 
+			// Calculate random value from range
+			int randValue = ThreadLocalRandom.current().nextInt(minIteration, (maxIteration+1));
+			currentValue = currentValue + randValue;
 			
-			
-			currentValue = ThreadLocalRandom.current().nextInt() % 2 == 0 ? (currentValue + iteration) : (currentValue - iteration);
-						
-			if(currentValue < minRange) {
-				currentValue = minRange;
-			}
-			
-			if(currentValue > maxRange) {
-				currentValue = maxRange;
+			if(currentValue < minRange || currentValue > maxRange) {
+				initAndReset();
 			}
 			
 		}
 		
 		measure.setType(getType());
 		measure.setPayload(String.valueOf(currentValue));
-		
-		
-		// TODO: Figure out how to handle current time
-		
+				
 		++count;
 		return measure;
 	}

@@ -40,7 +40,8 @@ public class VibrationSensor implements Sensor {
 	public int count = 0;
 	
 	@PostConstruct
-	public void init() {
+	@Override
+	public void initAndReset() {
 		currentValue = start;
 	}
 	
@@ -68,15 +69,10 @@ public class VibrationSensor implements Sensor {
 			
 			// Calculate random value from range
 			int randValue = ThreadLocalRandom.current().nextInt(minIteration, (maxIteration+1));
-			
 			currentValue = currentValue + randValue;
 			
-			if(currentValue < minRange) {
-				currentValue = minRange;
-			}
-			
-			if(currentValue > maxRange) {
-				currentValue = maxRange;
+			if(currentValue < minRange || currentValue > maxRange) {
+				initAndReset();
 			}
 			
 		}

@@ -4,6 +4,7 @@ import com.redhat.demo.iot.model.Measure;
 
 public interface Sensor {
 	
+	public void initAndReset();
 	public int getFrequency();
 	public String getType();
 	public boolean isEnabled();

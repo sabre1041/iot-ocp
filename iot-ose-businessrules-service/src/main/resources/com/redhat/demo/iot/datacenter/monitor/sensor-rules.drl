@@ -2,21 +2,11 @@ package com.redhat.demo.iot.datacenter.monitor
  
 import com.redhat.demo.businessRules.Measure;
 
-rule "OrganTemperatureTooLow"
-	lock-on-active true
-	when
-		$t : Measure( category == "Organ", dataType == "temperature", payload < "5" )
-	then
-		System.out.println("Rule 'low temperature' fired as temperature is " + $t.getPayload());
-		$t.setErrorCode(1);
-		$t.setErrorMessage("Temperature too low");
-		update( $t );
-end 
 
 rule "OrganTemperatureTooHigh"
 	lock-on-active true
 	when
-		$t : Measure( category == "Organ", dataType == "temperature", payload > "70" )
+		$t : Measure( category == "Organ", dataType == "temperature", payload != null, Integer.parseInt(payload) >= 70 )
 	then
 		System.out.println("Rule 'high temperature' fired as temperature is " + $t.getPayload());
 		$t.setErrorCode(1);
@@ -24,21 +14,11 @@ rule "OrganTemperatureTooHigh"
 		update( $t );
 end 
 
-rule "OrganVibrationTooLow"
-	lock-on-active true
-	when
-		$t : Measure( category == "Organ", dataType == "vibration", payload < "10" )
-	then
-		System.out.println("Rule 'low vibration' fired as vibration is " + $t.getPayload());
-		$t.setErrorCode(1);
-		$t.setErrorMessage("Vibration too low");
-		update( $t );
-end 
 
 rule "OrganVibrationTooHigh"
 	lock-on-active true
 	when
-		$t : Measure( category == "Organ", dataType == "vibration", payload > "15" )
+		$t : Measure( category == "Organ", dataType == "vibration", payload != null, Integer.parseInt(payload) >= 15 )
 	then
 		System.out.println("Rule 'high vibration' fired as vibration is " + $t.getPayload());
 		$t.setErrorCode(1);
@@ -46,32 +26,10 @@ rule "OrganVibrationTooHigh"
 		update( $t );
 end 
 
-rule "OrganCountdownTooLow"
-	lock-on-active true
-	when
-		$t : Measure( category == "Organ", dataType == "countdown", payload < "1800" )
-	then
-		System.out.println("Rule 'low countdown' fired as countdown is " + $t.getPayload());
-		$t.setErrorCode(1);
-		$t.setErrorMessage("Countdown too low");
-		update( $t );
-end 
-
-rule "MachineTemperatureTooLow"
-	lock-on-active true
-	when
-		$t : Measure( category == "Machine", dataType == "temperature", payload < "0" )
-	then
-		System.out.println("Rule 'low temperature' fired as temperature is " + $t.getPayload());
-		$t.setErrorCode(1);
-		$t.setErrorMessage("Temperature too low");
-		update( $t );
-end 
-
 rule "MachineTemperatureTooHigh"
 	lock-on-active true
 	when
-		$t : Measure( category == "Machine", dataType == "temperature", payload > "100" )
+		$t : Measure( category == "Machine", dataType == "temperature", payload != null, Integer.parseInt(payload) >= 100 )
 	then
 		System.out.println("Rule 'high temperature' fired as temperature is " + $t.getPayload());
 		$t.setErrorCode(1);
@@ -79,21 +37,10 @@ rule "MachineTemperatureTooHigh"
 		update( $t );
 end 
 
-rule "MachineVibrationTooLow"
-	lock-on-active true
-	when
-		$t : Measure( category == "Machine", dataType == "vibration", payload < "5" )
-	then
-		System.out.println("Rule 'low vibration' fired as vibration is " + $t.getPayload());
-		$t.setErrorCode(1);
-		$t.setErrorMessage("Vibration too low");
-		update( $t );
-end 
-
 rule "MachineVibrationTooHigh"
 	lock-on-active true
 	when
-		$t : Measure( category == "Machine", dataType == "vibration", payload > "25" )
+		$t : Measure( category == "Machine", dataType == "vibration", payload != null, Integer.parseInt(payload) >= 10 )
 	then
 		System.out.println("Rule 'high vibration' fired as vibration is " + $t.getPayload());
 		$t.setErrorCode(1);
