@@ -1,12 +1,182 @@
 #!/bin/bash
 
-
 SCRIPT_BASE_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 IOT_OSE_PROJECT="iot-ose"
 MQ_USER="iotuser"
 MQ_PASSWORD="iotuser"
 KIE_USER="kieuser"
 KIE_PASSWORD="kieuser1!"
+POSTGRESQL_APP_NAME="postgresql"
+POSTGRESQL_USERNAME="postgresiot"
+POSTGRESQL_PASSWORD="postgresiot"
+POSTGRESQL_DATABASE="iot"
+BUILD_CHECK_INTERVAL=5
+BUILD_CHECK_TIMES=60
+DEPLOYMENT_CHECK_INTERVAL=10
+DEPLOYMENT_CHECK_TIMES=60
+
+function validate_build_success() {
+
+    FIRST_BUILD_NAME="${1}-1"
+
+    # Get status of finished build
+    BUILD_STATUS=$(oc get build ${FIRST_BUILD_NAME} --template='{{ .status.phase }}')
+
+    if [ ${BUILD_STATUS} != "Complete" ]; then
+        echo
+        echo "Build did not complete successfully. Status is: ${BUILD_STATUS}"
+        echo
+        exit 1
+    fi
+
+}
+
+function wait_for_running_build() {
+    BUILD_NAME="$1-1"
+    COUNTER=0
+    
+    # Check to see if build exists
+    while [ ${COUNTER} -lt $BUILD_CHECK_TIMES ]
+    do
+        
+        BUILD_COUNT=$(oc get builds ${BUILD_NAME} --no-headers | wc -l | awk '{ print $1 }')
+        
+        if [ $BUILD_COUNT == "1" ]; then
+          break  
+        fi
+        
+        if [ $COUNTER -lt $BUILD_CHECK_TIMES ]; then
+            COUNTER=$(( $COUNTER + 1 ))
+        fi
+        
+        
+        if [ $COUNTER -eq $BUILD_CHECK_TIMES ]; then
+          echo "Max Validation Attempts Exceeded. Failed Verifying Application Build..."
+          exit 1
+        fi
+                
+        sleep $BUILD_CHECK_INTERVAL
+
+    done
+    
+    COUNTER=0
+    
+    # Check to see we have a running build
+    while [ ${COUNTER} -lt $BUILD_CHECK_TIMES ]
+    do
+        
+        BUILD_STATUS=$(oc get builds ${APP_NAME}-1 --template='{{ .status.phase }}')
+        
+        if [ $BUILD_STATUS == "Running" ]; then
+          break
+        elif [ $BUILD_STATUS == "Failed" ]; then
+            echo "Build has failed"
+            exit 2
+        fi
+        
+        if [ $COUNTER -lt $BUILD_CHECK_TIMES ]; then
+            COUNTER=$(( $COUNTER + 1 ))
+        fi
+        
+        
+        if [ $COUNTER -eq $BUILD_CHECK_TIMES ]; then
+          echo "Max Validation Attempts Exceeded. Failed Verifying Application Build..."
+          exit 1
+        fi
+                
+        sleep $BUILD_CHECK_INTERVAL
+
+    done   
+    
+}
+
+
+function wait_for_application_deployment() {
+    
+    DC_NAME=$1
+    DEPLOYMENT_VERSION=
+    RC_NAME=
+    COUNTER=0
+    
+    # Validate Deployment is Active
+    while [ ${COUNTER} -lt $DEPLOYMENT_CHECK_TIMES ]
+    do
+        
+        DEPLOYMENT_VERSION=$(oc get dc ${DC_NAME} --template='{{ .status.latestVersion }}')
+        
+        RC_NAME="${DC_NAME}-${DEPLOYMENT_VERSION}"
+        
+        if [ ${DEPLOYMENT_VERSION} == "1" ]; then
+          break
+        fi
+        
+        if [ $COUNTER -lt $DEPLOYMENT_CHECK_TIMES ]; then
+            COUNTER=$(( $COUNTER + 1 ))
+        fi
+        
+        
+        if [ $COUNTER -eq $DEPLOYMENT_CHECK_TIMES ]; then
+          echo "Max Validation Attempts Exceeded. Failed Verifying Application Deployment..."
+          exit 1
+        fi        
+        sleep $DEPLOYMENT_CHECK_INTERVAL
+        
+     done
+     
+     COUNTER=0
+
+     # Validate Deployment Complete
+     while [ ${COUNTER} -lt $DEPLOYMENT_CHECK_TIMES ]
+     do
+        
+         DEPLOYMENT_STATUS=$(oc get rc/${RC_NAME} --template '{{ index .metadata.annotations "openshift.io/deployment.phase" }}')
+                
+         if [ ${DEPLOYMENT_STATUS} == "Complete" ]; then
+           break
+         elif [ ${DEPLOYMENT_STATUS} == "Failed" ]; then
+             echo "Deployment Failed!"
+             exit 1
+         fi
+         
+         if [ $COUNTER -lt $DEPLOYMENT_CHECK_TIMES ]; then
+             COUNTER=$(( $COUNTER + 1 ))
+         fi
+         
+         
+         if [ $COUNTER -eq $DEPLOYMENT_CHECK_TIMES ]; then
+           echo "Max Validation Attempts Exceeded. Failed Verifying Application Deployment..."
+           exit 1
+         fi
+                 
+         sleep $DEPLOYMENT_CHECK_INTERVAL
+        
+      done     
+     
+}
+
+function validate_build_deploy() {
+    APP_NAME=$1
+    
+    # Wait for a build to be running
+    echo
+    echo "Waiting for a running build.."
+    echo
+    wait_for_running_build "${APP_NAME}"
+
+    oc logs build/${APP_NAME}-1 -f
+
+    # Pause 10 seconds
+    sleep 10
+    
+    echo
+    echo "Waiting for ${APP_NAME} to deploy..."
+    echo
+    wait_for_application_deployment "${APP_NAME}"
+
+}
+
+
+
 
 echo "Setting up OpenShift IoT Demo"
 
@@ -34,9 +204,37 @@ oc import-image -n ${IOT_OSE_PROJECT} jboss-amq-62 --all=true
 oc import-image -n ${IOT_OSE_PROJECT} fis-karaf-openshift --all=true
 
 echo
+echo "Deploying PostgreSQL..."
+echo
+oc process -v=POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE},POSTGRESQL_USER=${POSTGRESQL_USERNAME},POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD} -f ${SCRIPT_BASE_DIR}/support/templates/postgresql-ephemeral.json | oc create -n ${IOT_OSE_PROJECT} -f-
+
+echo
+echo "Waiting for PostgreSQL to deploy..."
+echo
+wait_for_application_deployment "${POSTGRESQL_APP_NAME}"
+
+
+echo
+echo "Creating Database Schema..."
+echo
+
+POSTGRESQL_POD_NAME=$(oc get pods -l "name=${POSTGRESQL_APP_NAME}" --template='{{ index .items 0 "metadata" "name" }}')
+
+oc rsync "${SCRIPT_BASE_DIR}/support/sql" $POSTGRESQL_POD_NAME:/tmp/
+
+sleep 10
+
+oc rsh -t ${POSTGRESQL_POD_NAME}  bash -c 'psql -f /tmp/sql/postgresql-iot.sql --variable=measureOwner=$POSTGRESQL_USER $POSTGRESQL_DATABASE' 
+
+echo
 echo "Deploying AMQ..."
 echo
 oc process -v=MQ_USERNAME=${MQ_USER},MQ_PASSWORD=${MQ_PASSWORD},IMAGE_STREAM_NAMESPACE=${IOT_OSE_PROJECT} -f ${SCRIPT_BASE_DIR}/support/templates/amq62-basic.json | oc create -n ${IOT_OSE_PROJECT} -f-
+
+echo
+echo "Waiting for AMQ to deploy..."
+echo
+wait_for_application_deployment "broker-amq"
 
 echo
 echo "Exposing MQTT Route..."
@@ -48,15 +246,21 @@ echo "Deploying Decision Server..."
 echo
 oc process -v=KIE_SERVER_USER="${KIE_USER}",KIE_SERVER_PASSWORD="${KIE_PASSWORD}",IMAGE_STREAM_NAMESPACE=${IOT_OSE_PROJECT} -f ${SCRIPT_BASE_DIR}/support/templates/decisionserver63-basic-s2i.json | oc create -n ${IOT_OSE_PROJECT} -f-
 
+validate_build_deploy "kie-app"
+
 echo
 echo "Deploying FIS Application..."
 echo
-oc process -v=KIE_APP_USER="${KIE_USER}",KIE_APP_PASSWORD="${KIE_PASSWORD}",BROKER_AMQ_USERNAME="${MQ_USER}",BROKER_AMQ_PASSWORD="${MQ_PASSWORD}",IMAGE_STREAM_NAMESPACE=${IOT_OSE_PROJECT} -f ${SCRIPT_BASE_DIR}/support/templates/fis-generic-template-build.json | oc create -n ${IOT_OSE_PROJECT} -f-
+oc process -v=KIE_APP_USER="${KIE_USER}",KIE_APP_PASSWORD="${KIE_PASSWORD}",BROKER_AMQ_USERNAME="${MQ_USER}",BROKER_AMQ_PASSWORD="${MQ_PASSWORD}",IMAGE_STREAM_NAMESPACE=${IOT_OSE_PROJECT},POSTGRESQL_USER=${POSTGRESQL_USERNAME},POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD},POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE} -f ${SCRIPT_BASE_DIR}/support/templates/fis-generic-template-build.json | oc create -n ${IOT_OSE_PROJECT} -f-
+
+validate_build_deploy "fis-app"
 
 echo
 echo "Deploying Software Sensor Application..."
 echo
 oc process -v=MQTT_USERNAME="${MQ_USER}",MQTT_PASSWORD="${MQ_PASSWORD}" -f ${SCRIPT_BASE_DIR}/support/templates/software-sensor-template.json | oc create -n ${IOT_OSE_PROJECT} -f-
+
+validate_build_deploy "software-sensor"
 
 echo
 echo "OpenShift IoT Demo Setup Complete."

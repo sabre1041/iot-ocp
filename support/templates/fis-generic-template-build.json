@@ -81,6 +81,24 @@
         "from": "[a-zA-Z]{6}[0-9]{1}!",
         "generate": "expression",
         "required": false
+    },
+    {
+        "description": "The user name to access the PostgreSQL Server.",
+        "name": "POSTGRESQL_USER",
+        "value": "postgresiot",
+        "required": true
+    },
+    {
+        "description": "The password to access the PostgreSQL Server.",
+        "name": "POSTGRESQL_PASSWORD",
+        "value": "postgresiot",
+        "required": true
+    },
+    {
+        "description": "Name of PostgreSQL Database.",
+        "name": "POSTGRESQL_DATABASE",
+        "value": "postgresiot",
+        "required": true
     }
   ],
   "objects": [
@@ -284,6 +302,18 @@
                   {
                       "name": "BROKER_AMQ_PASSWORD",
                       "value": "${BROKER_AMQ_PASSWORD}"
+                  },
+                  {
+                      "name": "POSTGRESQL_USER",
+                      "value": "${POSTGRESQL_USER}"
+                  },
+                  {
+                      "name": "POSTGRESQL_PASSWORD",
+                      "value": "${POSTGRESQL_PASSWORD}"
+                  },
+                  {
+                      "name": "POSTGRESQL_DATABASE",
+                      "value": "${POSTGRESQL_DATABASE}"
                   }
                 ]
               }

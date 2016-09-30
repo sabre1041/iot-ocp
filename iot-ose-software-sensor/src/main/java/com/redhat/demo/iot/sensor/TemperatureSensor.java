@@ -40,7 +40,7 @@ public class TemperatureSensor implements Sensor {
 	@Value("${sensor.temperature.maxRange}") 
 	private int maxRange;
 	
-	public int currentValue;
+	public double currentValue;
 	
 	public int count = 0;
 	
@@ -73,7 +73,7 @@ public class TemperatureSensor implements Sensor {
 		if(count > 0) {
 
 			// Calculate random value from range
-			int randValue = ThreadLocalRandom.current().nextInt(minIteration, (maxIteration+1));
+			double randValue = ThreadLocalRandom.current().nextDouble(minIteration, (maxIteration+1));
 			currentValue = currentValue + randValue;
 			
 			if(currentValue < minRange || currentValue > maxRange) {

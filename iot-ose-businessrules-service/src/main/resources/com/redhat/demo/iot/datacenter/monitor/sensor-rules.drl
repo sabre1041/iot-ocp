@@ -6,7 +6,7 @@ import com.redhat.demo.businessRules.Measure;
 rule "OrganTemperatureTooHigh"
 	lock-on-active true
 	when
-		$t : Measure( category == "Organ", dataType == "temperature", payload != null, Integer.parseInt(payload) >= 70 )
+		$t : Measure( category == "Organ", dataType == "temperature", payload != null, Double.parseDouble(payload) >= 70 )
 	then
 		System.out.println("Rule 'high temperature' fired as temperature is " + $t.getPayload());
 		$t.setErrorCode(1);
@@ -18,7 +18,7 @@ end
 rule "OrganVibrationTooHigh"
 	lock-on-active true
 	when
-		$t : Measure( category == "Organ", dataType == "vibration", payload != null, Integer.parseInt(payload) >= 15 )
+		$t : Measure( category == "Organ", dataType == "vibration", payload != null, Double.parseDouble(payload) >= 15 )
 	then
 		System.out.println("Rule 'high vibration' fired as vibration is " + $t.getPayload());
 		$t.setErrorCode(1);
@@ -29,7 +29,7 @@ end
 rule "MachineTemperatureTooHigh"
 	lock-on-active true
 	when
-		$t : Measure( category == "Machine", dataType == "temperature", payload != null, Integer.parseInt(payload) >= 100 )
+		$t : Measure( category == "Machine", dataType == "temperature", payload != null, Double.parseDouble(payload) >= 100 )
 	then
 		System.out.println("Rule 'high temperature' fired as temperature is " + $t.getPayload());
 		$t.setErrorCode(1);
@@ -40,7 +40,7 @@ end
 rule "MachineVibrationTooHigh"
 	lock-on-active true
 	when
-		$t : Measure( category == "Machine", dataType == "vibration", payload != null, Integer.parseInt(payload) >= 10 )
+		$t : Measure( category == "Machine", dataType == "vibration", payload != null, Double.parseDouble(payload) >= 10 )
 	then
 		System.out.println("Rule 'high vibration' fired as vibration is " + $t.getPayload());
 		$t.setErrorCode(1);

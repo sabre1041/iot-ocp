@@ -12,6 +12,14 @@
   	
   	<bean id="rules" class="com.redhat.demo.iotdemo.routingService.BusinessRulesBean" init-method="init" />
   	
+  	<!-- this is the JDBC data source which uses a PostgreSQL database -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+    	<property name="driverClassName" value="org.postgresql.Driver"/>
+    	<property name="url" value="jdbc:postgresql://${POSTGRESQL_SERVICE_HOST:localhost}:${POSTGRESQL_SERVICE_PORT:5432}/${POSTGRESQL_DATABASE:iot}"/>
+    	<property name="username" value="${POSTGRESQL_USER}"/>
+    	<property name="password" value="${POSTGRESQL_PASSWORD}"/>
+    </bean>
+  	
     
   	<!--Connection to activeMQ Broker running on same system  -->
   	<bean id="activemqGateway" class="org.apache.activemq.camel.component.ActiveMQComponent" >
@@ -28,6 +36,9 @@
   	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
   <camelContext xmlns="http://camel.apache.org/schema/spring">
+  
+  <propertyPlaceholder id="properties" location="sql.properties"/>
+    
   <dataFormats>
     <bindy type="Csv" classType="com.redhat.demo.iotdemo.routingService.Measure" id="bindyDataFormat"/>
   </dataFormats>
@@ -43,17 +54,20 @@
 
   <route id="processRules">
   <from uri="activemqGateway:queue:message.to.rules"/>
-  <!-- bean ref="myHelper" method="transform"/-->
   <bean ref="rules" method="processRules"/>
   <choice>
   	<when>
-  		<simple>${body.errorCode} == 0</simple>
-  	    <to uri="activemqGateway:queue:message.to.datacenter"/>
+  		<simple>${body.errorCode} != 0</simple>
+  		<log message="${body.dataType} Exceeds Threashold: ${body.errorMessage}"/>
   	</when>
   	<otherwise>
-  		<log message="${body.dataType} Exceeds Threashold: ${body.errorMessage}"/>
   	</otherwise>
   </choice>
+  <bean ref="myHelper" method="prepareJdbcHeaders"/>
+  <setBody>
+  	<constant>{{sql.insertMeasure}}</constant>
+  </setBody>
+  <to uri="jdbc:dataSource?useHeadersAsParameters=true"/>
   </route>
   
 </camelContext>
