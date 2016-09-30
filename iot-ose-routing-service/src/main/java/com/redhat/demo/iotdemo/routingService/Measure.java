@@ -20,16 +20,16 @@ public class Measure implements Serializable {
 	private String payload;
 	
 	@DataField(pos = 3, required = true) 
-	private String sensorType;
+	private String timestamp;
 	
 	@DataField(pos = 4, required = true) 
+	private String sensorType;
+
+	@DataField(pos = 5, required = true)
 	private String dataType;
 		
-	@DataField(pos = 5, required = true) 
-	private String deviceId;
-			
 	@DataField(pos = 6, required = true) 
-	private String timestamp;
+	private String deviceId;
 	
 	@DataField(pos = 7, required = false) 
 	private int errorCode;

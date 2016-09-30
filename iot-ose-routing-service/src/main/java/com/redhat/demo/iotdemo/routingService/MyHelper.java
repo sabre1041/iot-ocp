@@ -16,14 +16,6 @@ public class MyHelper {
 	private static final String TOPIC_SEPARTOR = "/";
 	private static final String COMMA = ",";
 	
-    private static final ThreadLocal<SimpleDateFormat> dateFormat = new ThreadLocal<SimpleDateFormat>(){
-        @Override
-        protected SimpleDateFormat initialValue()
-        {
-            return new SimpleDateFormat("dd.MM.yyy HH:mm:ss SSS");
-        }
-    };
-	
 	@Handler
 	public String enhanceMessage( String body,  Exchange exchange  ) {
 		
@@ -41,23 +33,10 @@ public class MyHelper {
 		sb.append(topicParts[2]);
 		sb.append(COMMA);
 		sb.append(topicParts[3]);
-		sb.append(COMMA);
-		sb.append(dateFormat.get().format(new Date()));
 		
 		return sb.toString();
 	}
    
-    @Handler
-    public String appendTimestamp( String body,  Exchange exchange ) {
-       
-        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyy HH:mm:ss SSS");
-        Date timeNow = new Date();
-
-        body = body +","+format.format(timeNow);
-             
-        return body;
-       
-    }
 
     public void prepareJdbcHeaders(@Body Measure measure, @Headers Map<String, Object> headers) {
 
@@ -68,8 +47,9 @@ public class MyHelper {
     	headers.put("payload", measure.getPayload());
     	headers.put("error_code", measure.getErrorCode());
     	headers.put("error_message", measure.getErrorMessage());
-//    	headers.put("time_stamp", measure.getTimestamp());
+    	headers.put("time_stamp", measure.getTimestamp());
 
     }
+    
 }
 

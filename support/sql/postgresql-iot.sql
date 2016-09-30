@@ -8,6 +8,6 @@ CREATE TABLE measure
     payload VARCHAR(255) NOT NULL,
     error_code INTEGER NOT NULL,
     error_message VARCHAR(255),
-    time_stamp TIMESTAMP
+    time_stamp TIMESTAMP NOT NULL
 );
 ALTER TABLE measure OWNER TO :measureOwner

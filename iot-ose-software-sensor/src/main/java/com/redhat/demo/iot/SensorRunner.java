@@ -1,7 +1,12 @@
 package com.redhat.demo.iot;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
@@ -19,7 +24,9 @@ public class SensorRunner implements Runnable {
         @Override
         protected SimpleDateFormat initialValue()
         {
-            return new SimpleDateFormat("yyyyMMdd HHmm");
+        	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HHmm");
+            sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+        	return sdf;
         }
     };
 
@@ -50,8 +57,8 @@ public class SensorRunner implements Runnable {
     
 	@Override
 	public void run() {
-
-		Measure measure = new Measure(deviceId, dateFormat.get().format(new Date()), category);
+		ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
+		Measure measure = new Measure(deviceId, String.valueOf(utc.toInstant().toEpochMilli()/1000), category);
 		
 		sensor.calculateCurrentMeasure(measure);
 		

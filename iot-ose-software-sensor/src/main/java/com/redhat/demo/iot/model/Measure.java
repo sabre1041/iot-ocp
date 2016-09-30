@@ -48,6 +48,8 @@ public class Measure implements Serializable {
 		sb.append(category);
 		sb.append(",");
 		sb.append(payload);
+		sb.append(",");
+		sb.append(timestamp);
 		return sb.toString();
 	}
 
