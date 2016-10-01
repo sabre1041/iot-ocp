@@ -165,6 +165,17 @@ function validate_build_deploy() {
 
     oc logs build/${APP_NAME}-1 -f
 
+    sleep 10
+
+    BUILD_STATUS=$(oc get build ${APP_NAME}-1 --template='{{ .status.phase }}')
+
+    if [ ${BUILD_STATUS} != "Complete" ]; then
+        echo
+        echo "${APP_NAME} build did not complete successfully. Status is: ${BUILD_STATUS}"
+        echo
+        exit 1
+    fi
+
     # Pause 10 seconds
     sleep 10
     
