@@ -201,6 +201,7 @@ echo "Creating ImageStreams..."
 echo
 oc create -n ${IOT_OSE_PROJECT} -f ${SCRIPT_BASE_DIR}/support/templates/jboss-image-streams.json
 oc create -n ${IOT_OSE_PROJECT} -f ${SCRIPT_BASE_DIR}/support/templates/fis-image-streams.json
+oc create -n ${IOT_OSE_PROJECT} -f ${SCRIPT_BASE_DIR}/support/templates/rhel-is.json
 
 echo
 echo "Pausing 10 Seconds..."
@@ -213,6 +214,7 @@ echo
 oc import-image -n ${IOT_OSE_PROJECT} jboss-decisionserver63-openshift --all=true
 oc import-image -n ${IOT_OSE_PROJECT} jboss-amq-62 --all=true
 oc import-image -n ${IOT_OSE_PROJECT} fis-karaf-openshift --all=true
+oc import-image -n ${IOT_OSE_PROJECT} rhel --all=true
 
 echo
 echo "Deploying PostgreSQL..."
@@ -272,6 +274,13 @@ echo
 oc process -v=MQTT_USERNAME="${MQ_USER}",MQTT_PASSWORD="${MQ_PASSWORD}" -f ${SCRIPT_BASE_DIR}/support/templates/software-sensor-template.json | oc create -n ${IOT_OSE_PROJECT} -f-
 
 validate_build_deploy "software-sensor"
+
+echo
+echo "Deploying Visualization Tool..."
+echo
+oc process -f ${SCRIPT_BASE_DIR}/support/templates/rhel-zeppelin.json | oc create -n ${IOT_OSE_PROJECT} -f-
+
+validate_build_deploy "rhel-zeppelin"
 
 echo
 echo "OpenShift IoT Demo Setup Complete."
