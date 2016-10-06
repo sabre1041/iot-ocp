@@ -5,8 +5,10 @@
 :Date:      10/10/2016
 
 == Overview
-Demonstration of Intelligent IoT Gateway on the Red Hat OpenShift Container Platform. The Gateway enables IoT data transformation, routing and real time decision-making at the edge. OpenShift provides secure enterprise-grade container platform to accelerate IoT application delivery. Each component of the demo runs in its own container, thereby, allowing security, scalability and ease of deployment. 
+Demonstration of Intelligent IoT Gateway on the Red Hat OpenShift Container Platform. The Gateway enables IoT data transformation, routing and real time decision-making at the edge. OpenShift provides secure enterprise-grade container platform to accelerate IoT application delivery. Each component of the demo runs in its own container, thereby, allowing security, scalability and ease of deployment.
+
 image:images/ose-iot.png[]
+
 This demo uses the CDK platform: learn how to install CDK https://github.com/redhatdemocentral/cdk-install-demo[here]
 
 *Please note: This repository is currently under development and the feature set/components are subject to change without notice*
