@@ -1,7 +1,11 @@
 IoT OpenShift Demo
 ===============
 
-Demonstration of Internet of Things (IoT) methodologies and technologies running on the Red Hat OpenShift Container Platform
+Demonstration of Intelligent IoT Gateway on the Red Hat OpenShift Container Platform. The Gateway enables IoT data transformation, routing and real time decision-making at the edge. OpenShift provides secure enterprise-grade container platform to accelerate IoT application delivery. Each component of the demo runs in its own container, thereby, allowing security, scalability and ease of deployment. 
+
+image:images/ose-iot.png[]
+
+This demo uses the CDK platform: learn how to install CDK https://github.com/redhatdemocentral/cdk-install-demo[here]
 
 *Please note: This repository is currently under development and the feature set/components are subject to change without notice*
 
@@ -10,6 +14,8 @@ Demonstration of Internet of Things (IoT) methodologies and technologies running
 * [AMQ and MQTT](https://access.redhat.com/documentation/en/red-hat-xpaas/0/paged/red-hat-xpaas-a-mq-image/)
 * [Realtime Decision Server](https://access.redhat.com/documentation/en/red-hat-xpaas/0/paged/red-hat-xpaas-a-mq-image/)
 * [Fuse Integration Services](https://access.redhat.com/documentation/en/red-hat-xpaas/version-0/red-hat-xpaas-fuse-integration-services-image/)
+* PostgreSQL
+* Zeppelin
 
 ## Prerequisites
 
