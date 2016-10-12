@@ -1,31 +1,39 @@
-= Build Intelligent IoT Gateway in a Few Easy Steps
-
-:Author:    Patrick Steiner, Ishu Verma
-:Email:     psteiner@redhat.com, iverma@redhat.com
-:Date:      09/14/2016
-
-:toc: macro
-
-toc::[]
+= Configuring Zeppelin Visualization Tool
 
 == Overview
-Intelligent IoT Gateway is the core pillar of enterprise Internet of Things (IoT) architecture because it enables real time  decision-making at the edge, secures downstream devices and optimizes network utilization. In this lab, you'll learn how to build the Intelligent IoT Gateway with open source software in a few simple steps. 
+Apache Zeppelin is a web-based too for interactive data analytics. It uses notebooks for data discovery, ingestion, analytics and visualization. The interpreter allows any language/data-processing-backend to be plugged into Zeppelin. For our project, we'll be using Postgresql backend.
 
-This Gateway can be implemented on a physical hardware (x84 64 bit) or a virtual machine running RHEL 7.2. The main comoponents of the Gateway are:
+== Configure Zeppelin
 
-* *Red Hat Enterprise Linux* to provide Enterprise class foundation
-* *JBOSS Fuse* to transform sensor data and route it to end points
-* *JBOSS BRMS* to enable real-time decision making at the edge
-* *JBOSS A-MQ* to arbitrate sensor data
+1. Login to the OpenShift environment web console (10.1.2.2:5443) and select the **iot-ose** project
+image:images/OSE-projects.png[width="500", height="400", align="center"]
+
+2. Locate the *zeppelin* service on the overview page and click on its url to launch the Zeppelin web console
+image:images/Zeppelin-service.png[width="500", height="400", align="center"]
+
+2. The first step is to configure zeppelin to communicate with the backend database. The integration between the tool and backend services is accomplished through *interpreters*. On the top right corner, locate and hover over the *anonymous* username and select **Interpreter**.
+
+3. Create a new interpreter called *iot-ose* by selecting **Create** on the top right hand corner of the page. Enter **iot-ose** in the name checkbox and select **psql** in the Interpreter dropdown. By selecting *psql*, several name/value pairs are automatically pre populated. Enter the following pairs to modify the default configurations.
+
+| Name  | Value |
+|----------|---------|
+| postgresql.password	| postgresiot |
+| postgresql.url | jdbc:postgresql://postgresql:5432/iot |
+| postgresql.user | postgresiot |
+
+Click **Save** to apply the changes
+
+The visualizations are contained in *Notebooks*. A preconfigured base note for the project are available in the *support/zeppelin* folder in a file called [iot-ose.json](support/zeppelin/iot-ose.json).
+
+This notebook can be imported to Zeppelin by selecting the Zeppelin logo on the top left to return to the homepage. Under notebook, select **Import note**. Select **Choose A JSON Here** and navigate to the json file.
+
+Select the **iot-ose** note that is now available under the notebook section. 
+
+Finally, enable the *iot-ose* interpreter created earlier by selecting the gear on the top right corner of the page representing the **interpreter Binding**. Locate the *iot-ose* interpreter and ensure that it is enabled by clicking on the interpreter so that is highlighted in blue. Drag the interpreter the top of the list to ensure that it is placed with a higher precedence than another interpreters. Click **Save** to apply the changes
+
+Execute all visualizations by hitting the play button on the top lefthand corner of the page next to the name of the note. 
 
 
-The task of configuring the gateway system including installing required software is automated through Ansible. Once the Gateway is provisioned, we'll put it into action by starting JBOSS Fuse, building & deploying the pre-built routing and business rules services. We'll then start sensor app that sends temperature data using MQTT to the JBOSS A-MQ broker. These messages will be forwarded to the services that we started earlier. Finally, we'll be creating the business rules to trigger desired action when the sensor value reaches a threshold. 
-
-=== Requirements
-- *Host System*: Ansible
-- *Gateway*: Download JBOSS Fuse 6.2.1 from the https://access.redhat.com/jbossnetwork/restricted/listSoftware.html?product=jboss.fuse&downloadType=distributions[Red Hat Customer Portal] and save it in the Downloads folder
-
-=== Step 1 - Prepare the system using Ansible
 
 We'll use the automation tool Ansible to remotely provision our Gateway system by installing required components.
 
