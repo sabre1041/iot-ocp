@@ -39,11 +39,9 @@ image:/images/zeppelin-interpreter-create.png[width="800", height="300", align="
 
 image:/images/zepellin-interpreter-create-form.png[width="800", height="300", align="center"]
 
-*Step 7:* The visualizations are contained in *Notebooks*. A preconfigured base note for the project are available in the *support/zeppelin* folder in a file called [iot-ose.json](support/zeppelin/iot-ose.json).
+*Step 7:* Click on Zeppelin logo on the top left to return to the homepage
 
-*Step 8:* Click on Zeppelin logo on the top left to return to the homepage
-
-*Step 9:* Under notebook, select **Import note** to import the pre-configured notebook (available  at support/zeppelin) 
+*Step 8:* Under notebook, select **Import note** to import the pre-configured https://github.com/ishuverma/iot-ose/blob/master/support/zeppelin/iot-ose.json[iot-ose notebook]  
 
 image:/images/zeppelin-importNote.png[width="800", height="300", align="center"]
 
