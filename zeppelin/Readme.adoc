@@ -9,7 +9,7 @@ Apache Zeppelin is a web-based too for interactive data analytics. It uses noteb
 
 image:/images/OSE-projects.png[width="500", height="400", align="center"]
 
-*Step 2:* Locate the *zeppelin* service on the overview page and click on its url to launch the Zeppelin web console
+*Step 2:* Locate the *Zeppelin* service on the overview page and click on its url to launch the Zeppelin web console
 
 image:/images/Zeppelin-service.png[width="500", height="400", align="center"]
 
@@ -17,11 +17,11 @@ image:/images/Zeppelin-service.png[width="500", height="400", align="center"]
 
 image:/images/zeppelin-interpreter.png[width="800", height="300", align="center"]
 
-*Step 4:* Create a new interpreter called *iot-ose* by selecting **Create** on the top right hand corner of the page
+*Step 4:* Create a new interpreter by selecting **Create** on the top right hand corner of the page
 
 image:/images/zeppelin-interpreter-create.png[width="800", height="300", align="center"]
 
-*Step 5:* Enter **iot-ose** in the name checkbox and select **psql** in the Interpreter dropdown. By selecting *psql*, several name/value pairs are automatically pre populated. Enter the following pairs to modify the default configurations.
+*Step 5:* Enter **iot-ose** as the name and select **psql** in the Interpreter group. Modify only the following values from default configuration:
 
 | Name  | Value |
 |----------|---------|
