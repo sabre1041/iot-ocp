@@ -5,15 +5,15 @@ Apache Zeppelin is a web-based too for interactive data analytics. It uses noteb
 
 == Configure Zeppelin
 
-1. Login to the OpenShift environment web console (10.1.2.2:5443) and select the **iot-ose** project
+*Step 1:* Login to the OpenShift environment web console (10.1.2.2:5443) and select the **iot-ose** project
 
 image:/images/OSE-projects.png[width="500", height="400", align="center"]
 
-2. Locate the *zeppelin* service on the overview page and click on its url to launch the Zeppelin web console
+*Step 2:* Locate the *zeppelin* service on the overview page and click on its url to launch the Zeppelin web console
 
 image:/images/Zeppelin-service.png[width="500", height="400", align="center"]
 
-2. Select *anonymous* username and click on **Interpreter**
+*Step 3:* Select *anonymous* username and click on **Interpreter**
 
 image:/images/zeppelin-interpreter.png[width="800", height="300", align="center"]
 
