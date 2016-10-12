@@ -12,10 +12,10 @@ image:/images/OSE-projects.png[width="500", height="400", align="center"]
 image:/images/Zeppelin-service.png[width="500", height="400", align="center"]
 
 2. Select *anonymous* username and click on **Interpreter**
-image:/images/Zeppelin-interpreter.png[width="700", height="300", align="center"]
+image:/images/zeppelin-interpreter.png[width="700", height="300", align="center"]
 
 3. Create a new interpreter called *iot-ose* by selecting **Create** on the top right hand corner of the page. 
-image:/images/Zeppelin-interpreter-create.png[width="700", height="300", align="center"]
+image:/images/zeppelin-interpreter-create.png[width="700", height="300", align="center"]
 
 4. Enter **iot-ose** in the name checkbox and select **psql** in the Interpreter dropdown. By selecting *psql*, several name/value pairs are automatically pre populated. Enter the following pairs to modify the default configurations.
 
@@ -26,22 +26,22 @@ image:/images/Zeppelin-interpreter-create.png[width="700", height="300", align="
 | postgresql.user | postgresiot |
 
 5. Click **Save** to apply the changes
-image:/images/Zeppelin-interpreter-create-form.png[width="700", height="300", align="center"]
+image:/images/zeppelin-interpreter-create-form.png[width="700", height="300", align="center"]
 
 6. The visualizations are contained in *Notebooks*. A preconfigured base note for the project are available in the *support/zeppelin* folder in a file called [iot-ose.json](support/zeppelin/iot-ose.json).
 
 6. Click on Zeppelin logo on the top left to return to the homepage
 
 7. Under notebook, select **Import note** to import the pre-configured notebook (available  at support/zeppelin) 
-image:/images/Zeppelin-importNote.png[width="700", height="300", align="center"]
+image:/images/zeppelin-importNote.png[width="700", height="300", align="center"]
 
 8. Enable the *iot-ose* interpreter created earlier by selecting the gear on the top right corner of the page representing the **interpreter Binding**. 
 
 9. Locate the *iot-ose* interpreter and drag it to top of the list (ensure the interpreter is enabled by clicking on it so that is highlighted in blue)
 
 10. Click **Save** to apply the changes
-image:/images/Zeppelin-.png[width="700", height="300", align="center"]
+image:/images/zeppelin-.png[width="700", height="300", align="center"]
 
 11. Execute all visualizations by hitting the play button on the top lefthand corner of the page next to the name of the note. 
-image:/images/Zeppelin-.png[width="700", height="300", align="center"]
+image:/images/zeppelin-.png[width="700", height="300", align="center"]
 
