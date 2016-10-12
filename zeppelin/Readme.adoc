@@ -1,7 +1,7 @@
 = Configuring Zeppelin Visualization Tool
 
 == Overview
-Apache Zeppelin is a web-based too for interactive data analytics. It uses notebooks for data discovery, ingestion, analytics and visualization. The interpreter allows any language/data-processing-backend to be plugged into Zeppelin. For our project, we'll be using Postgresql backend.
+Apache Zeppelin is a web-based too for interactive data analytics. It uses notebooks for data discovery, ingestion, analytics and visualization. The interpreters allows any language/data-processing-backend to be plugged into Zeppelin. For our project, we'll be using Postgresql backend.
 
 == Configure Zeppelin
 
@@ -11,9 +11,13 @@ image:images/OSE-projects.png[width="500", height="400", align="center"]
 2. Locate the *zeppelin* service on the overview page and click on its url to launch the Zeppelin web console
 image:images/Zeppelin-service.png[width="500", height="400", align="center"]
 
-2. The first step is to configure zeppelin to communicate with the backend database. The integration between the tool and backend services is accomplished through *interpreters*. On the top right corner, locate and hover over the *anonymous* username and select **Interpreter**.
+2. Select *anonymous* username and click on **Interpreter**
+image:images/Zeppelin-interpreter.png[width="700", height="300", align="center"]
 
-3. Create a new interpreter called *iot-ose* by selecting **Create** on the top right hand corner of the page. Enter **iot-ose** in the name checkbox and select **psql** in the Interpreter dropdown. By selecting *psql*, several name/value pairs are automatically pre populated. Enter the following pairs to modify the default configurations.
+3. Create a new interpreter called *iot-ose* by selecting **Create** on the top right hand corner of the page. 
+image:images/Zeppelin-interpreter-create.png[width="700", height="300", align="center"]
+
+4. Enter **iot-ose** in the name checkbox and select **psql** in the Interpreter dropdown. By selecting *psql*, several name/value pairs are automatically pre populated. Enter the following pairs to modify the default configurations.
 
 | Name  | Value |
 |----------|---------|
@@ -21,18 +25,25 @@ image:images/Zeppelin-service.png[width="500", height="400", align="center"]
 | postgresql.url | jdbc:postgresql://postgresql:5432/iot |
 | postgresql.user | postgresiot |
 
-Click **Save** to apply the changes
+5. Click **Save** to apply the changes
+image:images/Zeppelin-interpreter-create-form.png[width="700", height="300", align="center"]
 
-The visualizations are contained in *Notebooks*. A preconfigured base note for the project are available in the *support/zeppelin* folder in a file called [iot-ose.json](support/zeppelin/iot-ose.json).
+6. The visualizations are contained in *Notebooks*. A preconfigured base note for the project are available in the *support/zeppelin* folder in a file called [iot-ose.json](support/zeppelin/iot-ose.json).
 
-This notebook can be imported to Zeppelin by selecting the Zeppelin logo on the top left to return to the homepage. Under notebook, select **Import note**. Select **Choose A JSON Here** and navigate to the json file.
+6. Click on Zeppelin logo on the top left to return to the homepage
 
-Select the **iot-ose** note that is now available under the notebook section. 
+7. Under notebook, select **Import note** to import the pre-configured notebook (available  at support/zeppelin) 
+image:images/Zeppelin-importNote.png[width="700", height="300", align="center"]
 
-Finally, enable the *iot-ose* interpreter created earlier by selecting the gear on the top right corner of the page representing the **interpreter Binding**. Locate the *iot-ose* interpreter and ensure that it is enabled by clicking on the interpreter so that is highlighted in blue. Drag the interpreter the top of the list to ensure that it is placed with a higher precedence than another interpreters. Click **Save** to apply the changes
+8. Enable the *iot-ose* interpreter created earlier by selecting the gear on the top right corner of the page representing the **interpreter Binding**. 
 
-Execute all visualizations by hitting the play button on the top lefthand corner of the page next to the name of the note. 
+9. Locate the *iot-ose* interpreter and drag it to top of the list (ensure the interpreter is enabled by clicking on it so that is highlighted in blue)
 
+10. Click **Save** to apply the changes
+image:images/Zeppelin-.png[width="700", height="300", align="center"]
+
+11. Execute all visualizations by hitting the play button on the top lefthand corner of the page next to the name of the note. 
+image:images/Zeppelin-.png[width="700", height="300", align="center"]
 
 
 We'll use the automation tool Ansible to remotely provision our Gateway system by installing required components.
