@@ -6,16 +6,20 @@ Apache Zeppelin is a web-based too for interactive data analytics. It uses noteb
 == Configure Zeppelin
 
 1. Login to the OpenShift environment web console (10.1.2.2:5443) and select the **iot-ose** project
+
 image:/images/OSE-projects.png[width="500", height="400", align="center"]
 
 2. Locate the *zeppelin* service on the overview page and click on its url to launch the Zeppelin web console
+
 image:/images/Zeppelin-service.png[width="500", height="400", align="center"]
 
 2. Select *anonymous* username and click on **Interpreter**
-image:/images/zeppelin-interpreter.png[width="700", height="300", align="center"]
 
-3. Create a new interpreter called *iot-ose* by selecting **Create** on the top right hand corner of the page. 
-image:/images/zeppelin-interpreter-create.png[width="700", height="300", align="center"]
+image:/images/zeppelin-interpreter.png[width="900", height="300", align="center"]
+
+3. Create a new interpreter called *iot-ose* by selecting **Create** on the top right hand corner of the page
+
+image:/images/zeppelin-interpreter-create.png[width="900", height="300", align="center"]
 
 4. Enter **iot-ose** in the name checkbox and select **psql** in the Interpreter dropdown. By selecting *psql*, several name/value pairs are automatically pre populated. Enter the following pairs to modify the default configurations.
 
@@ -26,14 +30,16 @@ image:/images/zeppelin-interpreter-create.png[width="700", height="300", align="
 | postgresql.user | postgresiot |
 
 5. Click **Save** to apply the changes
-image:/images/zeppelin-interpreter-create-form.png[width="700", height="300", align="center"]
+
+image:/images/zeppelin-interpreter-create-form.png[width="900", height="300", align="center"]
 
 6. The visualizations are contained in *Notebooks*. A preconfigured base note for the project are available in the *support/zeppelin* folder in a file called [iot-ose.json](support/zeppelin/iot-ose.json).
 
 6. Click on Zeppelin logo on the top left to return to the homepage
 
 7. Under notebook, select **Import note** to import the pre-configured notebook (available  at support/zeppelin) 
-image:/images/zeppelin-importNote.png[width="700", height="300", align="center"]
+
+image:/images/zeppelin-importNote.png[width="900", height="300", align="center"]
 
 8. Enable the *iot-ose* interpreter created earlier by selecting the gear on the top right corner of the page representing the **interpreter Binding**. 
 
