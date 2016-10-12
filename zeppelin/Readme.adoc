@@ -26,22 +26,22 @@ image:/images/Zeppelin-interpreter-create.png[width="700", height="300", align="
 | postgresql.user | postgresiot |
 
 5. Click **Save** to apply the changes
-image:images/Zeppelin-interpreter-create-form.png[width="700", height="300", align="center"]
+image:/images/Zeppelin-interpreter-create-form.png[width="700", height="300", align="center"]
 
 6. The visualizations are contained in *Notebooks*. A preconfigured base note for the project are available in the *support/zeppelin* folder in a file called [iot-ose.json](support/zeppelin/iot-ose.json).
 
 6. Click on Zeppelin logo on the top left to return to the homepage
 
 7. Under notebook, select **Import note** to import the pre-configured notebook (available  at support/zeppelin) 
-image:images/Zeppelin-importNote.png[width="700", height="300", align="center"]
+image:/images/Zeppelin-importNote.png[width="700", height="300", align="center"]
 
 8. Enable the *iot-ose* interpreter created earlier by selecting the gear on the top right corner of the page representing the **interpreter Binding**. 
 
 9. Locate the *iot-ose* interpreter and drag it to top of the list (ensure the interpreter is enabled by clicking on it so that is highlighted in blue)
 
 10. Click **Save** to apply the changes
-image:images/Zeppelin-.png[width="700", height="300", align="center"]
+image:/images/Zeppelin-.png[width="700", height="300", align="center"]
 
 11. Execute all visualizations by hitting the play button on the top lefthand corner of the page next to the name of the note. 
-image:images/Zeppelin-.png[width="700", height="300", align="center"]
+image:/images/Zeppelin-.png[width="700", height="300", align="center"]
 
