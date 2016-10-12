@@ -15,11 +15,11 @@ image:/images/Zeppelin-service.png[width="500", height="400", align="center"]
 
 *Step 3:* Select *anonymous* username and click on **Interpreter**
 
-image:/images/zeppelin-interpreter.png[width="800", height="300", align="center"]
+image:/images/zeppelin-interpreter.png[width="700", height="300", align="center"]
 
 *Step 4:* Create a new interpreter by selecting **Create** on the top right hand corner of the page
 
-image:/images/zeppelin-interpreter-create.png[width="800", height="300", align="center"]
+image:/images/zeppelin-interpreter-create.png[width="700", height="300", align="center"]
 
 *Step 5:* Enter **iot-ose** as the name and select **psql** in the Interpreter group. Modify only the following values from default configuration:
 
@@ -45,13 +45,13 @@ image:/images/zepellin-interpreter-create-form.png[width="800", height="300", al
 
 image:/images/zeppelin-importNote.png[width="800", height="300", align="center"]
 
-*Step 10:* Enable the *iot-ose* interpreter created earlier by selecting the gear on the top right corner of the page representing the **interpreter Binding**. 
+*Step 9:* Enable the *iot-ose* interpreter created earlier by selecting the gear on the top right corner of the page representing the **interpreter Binding**. 
 
-*Step 11:* Locate the *iot-ose* interpreter and drag it to top of the list (ensure the interpreter is enabled by clicking on it so that is highlighted in blue)
+*Step 10:* Locate the *iot-ose* interpreter and drag it to top of the list (ensure the interpreter is enabled by clicking on it so that is highlighted in blue)
 
-*Step 12:* Click **Save** to apply the changes
+*Step 11:* Click **Save** to apply the changes
 image:/images/zeppelin-.png[width="700", height="300", align="center"]
 
-*Step 13:* Execute all visualizations by hitting the play button on the top lefthand corner of the page next to the name of the note. 
+*Step 12:* Execute all visualizations by hitting the play button on the top lefthand corner of the page next to the name of the note. 
 image:/images/zeppelin-.png[width="700", height="300", align="center"]
 
