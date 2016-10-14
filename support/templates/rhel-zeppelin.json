@@ -3,14 +3,14 @@
     "apiVersion": "v1",
     "metadata": {
         "annotations": {
-            "description": "Software sensor application template.",
+            "description": "Zeppelin RHEL application template.",
             "iconClass": "icon-java",
             "tags": "java"
         },
-        "name": "software-sensor"
+        "name": "rhel-zeppelin"
     },
     "labels": {
-        "template": "software-sensor"
+        "template": "rhel-zeppelin"
     },
     "parameters": [
         {
