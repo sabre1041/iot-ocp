@@ -14,11 +14,13 @@ This demo uses the CDK platform: learn how to install CDK https://github.com/red
 *Please note: This repository is currently under development and the feature set/components are subject to change without notice*
 
 
-== Components
+== Core Components
+*https://access.redhat.com/documentation/en/red-hat-xpaas/version-0/red-hat-xpaas-fuse-integration-services-image/[Fuse Integration Services]*
+Red Hat JBoss Fuse Integration Services provides a set of tools and containerized xPaaS images that enable development, deployment, and management of integration microservices within OpenShift.
 
 * [AMQ and MQTT](https://access.redhat.com/documentation/en/red-hat-xpaas/0/paged/red-hat-xpaas-a-mq-image/)
 * [Realtime Decision Server](https://access.redhat.com/documentation/en/red-hat-xpaas/0/paged/red-hat-xpaas-a-mq-image/)
-* [Fuse Integration Services](https://access.redhat.com/documentation/en/red-hat-xpaas/version-0/red-hat-xpaas-fuse-integration-services-image/)
+
 * [Apache Zeppelin](https://zeppelin.apache.org/)
 * Simulated Software Sensor
 
