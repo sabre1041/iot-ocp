@@ -47,4 +47,11 @@ The https://github.com/sabre1041/iot-ose/blob/master/init.sh[init.sh] script aut
  
 The init script triggers asynchronous builds and deployments of AMQ, Decision Server, Fuse Integration Service, PostgreSQL, Zeppelin and Software Sensor components. The last step is to configure the Zeppelin visualization tool. Perform https://github.com/ishuverma/iot-ose/tree/master/zeppelin[these instructions] to configure Zeppelin.
 
+== Scaling Down the Demo
+The demo can be scaled down from the project overview page in the following order:
+
+
+== Scaling Up the Demo
+
+
 
