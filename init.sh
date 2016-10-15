@@ -219,7 +219,7 @@ oc import-image -n ${IOT_OSE_PROJECT} rhel --all=true
 echo
 echo "Deploying PostgreSQL..."
 echo
-oc process -v=POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE},POSTGRESQL_USER=${POSTGRESQL_USERNAME},POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD} -f ${SCRIPT_BASE_DIR}/support/templates/postgresql-ephemeral.json | oc create -n ${IOT_OSE_PROJECT} -f-
+oc process -v=POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE},POSTGRESQL_USER=${POSTGRESQL_USERNAME},POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD} -f ${SCRIPT_BASE_DIR}/support/templates/postgresql-persistent.json | oc create -n ${IOT_OSE_PROJECT} -f-
 
 echo
 echo "Waiting for PostgreSQL to deploy..."
