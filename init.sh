@@ -282,6 +282,17 @@ oc process -f ${SCRIPT_BASE_DIR}/support/templates/rhel-zeppelin.json | oc creat
 
 validate_build_deploy "rhel-zeppelin"
 
+sleep 10
+
+echo
+echo "Adding IOT Postgresql Interperter"
+echo
+
+# Get Route
+ZEPPELIN_ROUTE=$(oc get routes rhel-zeppelin --template='{{ .spec.host }}')
+
+curl -s --fail -H "Content-Type: application/json" -X POST -d "{\"name\":\"iot-ose\",\"group\":\"psql\",\"properties\":{\"postgresql.password\":\"${POSTGRESQL_PASSWORD}\",\"postgresql.max.result\":\"1000\",\"postgresql.user\":\"${POSTGRESQL_USERNAME}\",\"postgresql.url\":\"jdbc:postgresql://postgresql:5432/\",\"postgresql.driver.name\":\"org.postgresql.Driver\"},\"dependencies\":[],\"option\":{\"remote\":true,\"isExistingProcess\":false,\"perNoteSession\":false,\"perNoteProcess\":false},\"propertyValue\":\"\",\"propertyKey\":\"\"}" http://${ZEPPELIN_ROUTE}/api/interpreter/setting
+
 echo
 echo "OpenShift IoT Demo Setup Complete."
 echo
