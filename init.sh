@@ -214,7 +214,7 @@ echo
 oc import-image -n ${IOT_OSE_PROJECT} jboss-decisionserver63-openshift --all=true
 oc import-image -n ${IOT_OSE_PROJECT} jboss-amq-62 --all=true
 oc import-image -n ${IOT_OSE_PROJECT} fis-karaf-openshift --all=true
-oc import-image -n ${IOT_OSE_PROJECT} rhel --all=true
+oc import-image -n ${IOT_OSE_PROJECT} rhel7 --all=true
 
 echo
 echo "Deploying PostgreSQL..."
@@ -291,7 +291,7 @@ echo
 # Get Route
 ZEPPELIN_ROUTE=$(oc get routes rhel-zeppelin --template='{{ .spec.host }}')
 
-curl -s --fail -H "Content-Type: application/json" -X POST -d "{\"name\":\"iot-ose\",\"group\":\"psql\",\"properties\":{\"postgresql.password\":\"${POSTGRESQL_PASSWORD}\",\"postgresql.max.result\":\"1000\",\"postgresql.user\":\"${POSTGRESQL_USERNAME}\",\"postgresql.url\":\"jdbc:postgresql://postgresql:5432/\",\"postgresql.driver.name\":\"org.postgresql.Driver\"},\"dependencies\":[],\"option\":{\"remote\":true,\"isExistingProcess\":false,\"perNoteSession\":false,\"perNoteProcess\":false},\"propertyValue\":\"\",\"propertyKey\":\"\"}" http://${ZEPPELIN_ROUTE}/api/interpreter/setting
+curl -s --fail -H "Content-Type: application/json" -X POST -d "{\"name\":\"iot-ose\",\"group\":\"psql\",\"properties\":{\"postgresql.password\":\"${POSTGRESQL_PASSWORD}\",\"postgresql.max.result\":\"1000\",\"postgresql.user\":\"${POSTGRESQL_USERNAME}\",\"postgresql.url\":\"jdbc:postgresql://postgresql:5432/iot\",\"postgresql.driver.name\":\"org.postgresql.Driver\"},\"dependencies\":[],\"option\":{\"remote\":true,\"isExistingProcess\":false,\"perNoteSession\":false,\"perNoteProcess\":false},\"propertyValue\":\"\",\"propertyKey\":\"\"}" http://${ZEPPELIN_ROUTE}/api/interpreter/setting
 
 echo
 echo "OpenShift IoT Demo Setup Complete."
