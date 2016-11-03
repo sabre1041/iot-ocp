@@ -42,6 +42,7 @@ The https://github.com/sabre1041/iot-ose/blob/master/init.sh[init.sh] script, pr
 The init script triggers asynchronous builds and deployments of A-MQ, Decision Server, Fuse Integration Service, PostgreSQL, Zeppelin and Software Sensor components. OpenShift web console provides a graphical UI into the setup.
 
 *Step 4:* Login to the OpenShift web console using a web browser at 10.1.2.2:5443 (login/password - admin/admin) and select the **iot-ose** project
+
 image:/images/OSE-projects.png[width="500", height="400", align="center"]
 
 == Configure the Zeppelin visualization tool
@@ -81,12 +82,9 @@ image:/images/zepellin-interpreter-create-form.png[width="750", height="300", al
 
 image:/images/zeppelin-importNote.png[width="750", height="300", align="center"]
 
-*Step 9:* Enable the *iot-ose* interpreter created earlier by selecting the gear on the top right corner of the page representing the **interpreter Binding**. 
+*Step 11:* Enable the *iot-ose* interpreter created earlier by selecting the gear on the top right corner of the page representing the **interpreter Binding**. 
 
-*Step 10:* Locate the *iot-ose* interpreter and drag it to top of the list (ensure the interpreter is enabled by clicking on it so that is highlighted in blue)
+*Step 12:* Locate the *iot-ose* interpreter and drag it to top of the list (ensure the interpreter is enabled by clicking on it so that is highlighted in blue) and click **Save** to apply the changes
 
-*Step 11:* Click **Save** to apply the changes
-image:/images/zeppelin-.png[width="750", height="300", align="center"]
-
-*Step 12:* Execute all visualizations by hitting the play button on the top lefthand corner of the page next to the name of the note. 
+*Step 13:* Execute all visualizations by hitting the play button on the top lefthand corner of the page next to the name of the note. 
 image:/images/zeppelin-.png[width="750", height="300", align="center"]
