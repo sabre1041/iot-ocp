@@ -1,11 +1,9 @@
 = IoT OpenShift Demo
 ===============
 
-This demo showcases Intelligent IoT Gateway on the Red Hat OpenShift Container Platform. The IoT Gateway enables real time decision-making at the edge. OpenShift provides secure enterprise-grade container platform to accelerate IoT application delivery. The demo leverages containers and microservices to bring security, scalability and ease of deployment.
+This demo showcases Intelligent IoT Gateway on the Red Hat OpenShift Container Platform. The Intelligent IoT Gateway enables real time decision-making at the edge. OpenShift provides secure enterprise-grade container platform to accelerate IoT application delivery. Through the use of containers and microservices, this demo enables security, scalability and ease of deployment.
 
 image:images/ose-iot.png[width="500", height="400", align="center"]
-
-The OpenShift environment can be enabled by CDK platform. To learn how to install CDK, check out https://github.com/redhatdemocentral/cdk-install-demo[CDK-Install Demo]
 
 *Please note: This repository is currently under development and the feature set/components are subject to change without notice*
 
@@ -20,11 +18,10 @@ Red Hat JBoss Fuse Integration Services provides a set of tools and containerize
 
 == Prerequisites
 
-The following prerequisites must be satisfied prior to running the demo
-
-* Git client
+* Git
 * Access to an OpenShift environment
-* OpenShift Command Line Interface (CLI)
+_Note: The OpenShift environment can be enabled by CDK platform. To learn how to install CDK, check out https://github.com/redhatdemocentral/cdk-install-demo[CDK-Install Demo]_
+* OpenShift Command Line Interface (CLI) - Do we still need this?
 
 == Setup
 *Step 1:* Launch the OpenShift Container platform and login to OpenShift Command Line
@@ -42,26 +39,26 @@ The https://github.com/sabre1041/iot-ose/blob/master/init.sh[init.sh] script, pr
  
 The init script triggers asynchronous builds and deployments of A-MQ, Decision Server, Fuse Integration Service, PostgreSQL, Zeppelin and Software Sensor components. OpenShift web console provides a graphical UI into the setup.
 
-*Step 4:* Login to the OpenShift web console using a web browser at 10.1.2.2:5443 (admin/admin) and select the **iot-ose** project
-
+*Step 4:* Login to the OpenShift web console using a web browser at 10.1.2.2:5443 (login/password - admin/admin) and select the **iot-ose** project
 image:/images/OSE-projects.png[width="500", height="400", align="center"]
 
-The last step is to configure the Zeppelin visualization tool. 
+== Configure the Zeppelin visualization tool
 
-*Step 2:* Locate the *Zeppelin* service on the overview page and click on its url to launch the Zeppelin web console
+We're using Apache Zeppelin tool for interactive data analytics. The data visualization is stored in Notebooks. The interpreters allows Zeppelin to connect with Postgresql-backend.
+
+*Step 5:* Locate the *Zeppelin* service on the overview page and click on its url to launch the Zeppelin web console
 
 image:/images/Zeppelin-service.png[width="500", height="400", align="center"]
 
-*Step 3:* Select *anonymous* username and click on **Interpreter**
+*Step 6:* Select *anonymous* username and click on **Interpreter**
 
 image:/images/zeppelin-interpreter.png[width="750", height="300", align="center"]
 
-*Step 4:* Create a new interpreter by selecting **Create** on the top right hand corner of the page
+*Step 7:* Create a new interpreter by selecting **Create** on the top right hand corner of the page
 
 image:/images/zeppelin-interpreter-create.png[width="750", height="300", align="center"]
 
-*Step 5:* Enter **iot-ose** as the name and select **psql** in the Interpreter group. Modify only the following values from default configuration:
-
+*Step 8:* Enter **iot-ose** as the name and select **psql** in the Interpreter group. Modify only the following values from default configuration and then **Save** to apply the changes
 
 [width="50%",cols="2,^2",options="header"]
 |=========================================================
@@ -74,13 +71,11 @@ image:/images/zeppelin-interpreter-create.png[width="750", height="300", align="
 |postgresql.user |postgresiot
 |=========================================================
 
-*Step 6:* Click **Save** to apply the changes
-
 image:/images/zepellin-interpreter-create-form.png[width="750", height="300", align="center"]
 
-*Step 7:* Click on Zeppelin logo on the top left to return to the homepage
+*Step 9:* Click on Zeppelin logo on the top left to return to the homepage
 
-*Step 8:* Under notebook, select **Import note** to import the pre-configured https://github.com/ishuverma/iot-ose/blob/master/support/zeppelin/iot-ose.json[iot-ose notebook]  
+*Step 10:* Under notebook, select **Import note** to import the pre-configured https://github.com/ishuverma/iot-ose/blob/master/support/zeppelin/iot-ose.json[iot-ose notebook]  
 
 image:/images/zeppelin-importNote.png[width="750", height="300", align="center"]
 
@@ -93,34 +88,3 @@ image:/images/zeppelin-.png[width="750", height="300", align="center"]
 
 *Step 12:* Execute all visualizations by hitting the play button on the top lefthand corner of the page next to the name of the note. 
 image:/images/zeppelin-.png[width="750", height="300", align="center"]
-
-
-
-
-== Post Script Configuration
-
-The majority of the components are automatically deployed and configured. The Zeppelin visualization tool requires several manual step to fully configure the tool for records that are produced by the applications.
-
-First, login to the OpenShift environment and locate the **iot-ose** project. Select the project and locate the *zeppelin* service on the overview page. Next to the service is the exposed HTTP url. Select the URL to launch the Zeppelin web console. 
-
-The first step is to configure zeppelin to communicate with the backend database. The integration between the tool and backend services is accomplished through *interpreters*. On the top right corner, locate and hover over the *anonymous* username and select **Interpreter**.
-
-Create a new interpreter called *iot-ose* by selecting **Create** on the top right hand corner of the page. Enter **iot-ose** in the name checkbox and select **psql** in the Interpreter dropdown. By selecting *psql*, several name/value pairs are automatically pre populated. Enter the following pairs to modify the default configurations.
-
-| Name  | Value |
-|----------|---------|
-| postgresql.password	| postgresiot |
-| postgresql.url | jdbc:postgresql://postgresql:5432/iot |
-| postgresql.user | postgresiot |
-
-Click **Save** to apply the changes
-
-The visualizations are contained in *Notebooks*. A preconfigured base note for the project are available in the *support/zeppelin* folder in a file called [iot-ose.json](support/zeppelin/iot-ose.json).
-
-This notebook can be imported to Zeppelin by selecting the Zeppelin logo on the top left to return to the homepage. Under notebook, select **Import note**. Select **Choose A JSON Here** and navigate to the json file.
-
-Select the **iot-ose** note that is now available under the notebook section. 
-
-Finally, enable the *iot-ose* interpreter created earlier by selecting the gear on the top right corner of the page representing the **interpreter Binding**. Locate the *iot-ose* interpreter and ensure that it is enabled by clicking on the interpreter so that is highlighted in blue. Drag the interpreter the top of the list to ensure that it is placed with a higher precedence than another interpreters. Click **Save** to apply the changes
-
-Execute all visualizations by hitting the play button on the top lefthand corner of the page next to the name of the note. 
