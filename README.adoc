@@ -1,11 +1,12 @@
 = IoT OpenShift Demo
 ===============
 
-Demonstration of Intelligent IoT Gateway on the Red Hat OpenShift Container Platform. The Gateway enables IoT data transformation, routing and real time decision-making at the edge. OpenShift provides secure enterprise-grade container platform to accelerate IoT application delivery. Each component of the demo runs in its own container, thereby, allowing security, scalability and ease of deployment.
+This demo showcases Intelligent IoT Gateway on the Red Hat OpenShift Container Platform. The IoT Gateway enables real time decision-making at the edge. OpenShift provides secure enterprise-grade container platform to accelerate IoT application delivery. The demo leverages containers and microservices to bring security, scalability and ease of deployment.
 
 image:images/ose-iot.png[width="500", height="400", align="center"]
 
-This demo uses the CDK platform: learn how to install CDK https://github.com/redhatdemocentral/cdk-install-demo[here]
+The OpenShift environment can be enabled by CDK platform. To learn how to install CDK, check out https://github.com/redhatdemocentral/cdk-install-demo[CDK-Install Demo]
+
 *Please note: This repository is currently under development and the feature set/components are subject to change without notice*
 
 == Components
@@ -15,7 +16,7 @@ Red Hat JBoss Fuse Integration Services provides a set of tools and containerize
 * https://access.redhat.com/documentation/en/red-hat-xpaas/0/paged/red-hat-xpaas-a-mq-image/[AMQ and MQTT]
 * https://access.redhat.com/documentation/en/red-hat-xpaas/0/paged/red-hat-xpaas-a-mq-image/[Realtime Decision Server]
 * https://zeppelin.apache.org/[Apache Zeppelin]
-* Simulated Software Sensor
+* Simulated Software Sensor - Need a description
 
 == Prerequisites
 
@@ -26,7 +27,7 @@ The following prerequisites must be satisfied prior to running the demo
 * OpenShift Command Line Interface (CLI)
 
 == Setup
-Launch the OpenShift Container platform and login OpenShift Command Line. Learn how to install OpenShift Container platform https://github.com/redhatdemocentral/cdk-install-demo[here]. 
+Launch the OpenShift Container platform and login to OpenShift Command Line
 
 Download the iot-ose project in the OpenShift instance:
 
