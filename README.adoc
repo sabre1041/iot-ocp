@@ -20,7 +20,9 @@ Red Hat JBoss Fuse Integration Services provides a set of tools and containerize
 
 * Git
 * Access to an OpenShift environment
+
 _Note: The OpenShift environment can be enabled by CDK platform. To learn how to install CDK, check out https://github.com/redhatdemocentral/cdk-install-demo[CDK-Install Demo]_
+
 * OpenShift Command Line Interface (CLI) - Do we still need this?
 
 == Setup
