@@ -3,7 +3,7 @@
 
 This demo showcases Intelligent IoT Gateway on the Red Hat OpenShift Container Platform. The Intelligent IoT Gateway enables real time decision-making at the edge. OpenShift provides secure enterprise-grade container platform to accelerate IoT application delivery. Through the use of containers and microservices, this demo enables security, scalability and ease of deployment.
 
-image:images/IoT-OSE-Containers.png[width="462", height="614", align="center"]
+image:images/IoT-OSE-Containers.png[width="462", height="614", role="center"]
 
 *Please note: This repository is currently under development and the feature set/components are subject to change without notice*
 
