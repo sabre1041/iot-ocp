@@ -54,6 +54,13 @@
             "from": "[a-zA-Z0-9]{8}",
             "generate": "expression",
             "required": true
+        },
+        {
+            "name": "VOLUME_CAPACITY",
+            "displayName": "Volume Capacity",
+            "description": "Volume space available for data, e.g. 512Mi, 2Gi.",
+            "value": "1Gi",
+            "required": true
         }
     ],
     "objects": [
@@ -105,6 +112,23 @@
                 "name": "${APPLICATION_NAME}",
                 "labels": {
                     "application": "${APPLICATION_NAME}"
+                }
+            }
+        },
+        {
+            "kind": "PersistentVolumeClaim",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APPLICATION_NAME}"
+            },
+            "spec": {
+                "accessModes": [
+                    "ReadWriteOnce"
+                ],
+                "resources": {
+                    "requests": {
+                        "storage": "${VOLUME_CAPACITY}"
+                    }
                 }
             }
         },
@@ -221,7 +245,21 @@
                                         "containerPort": 8080,
                                         "protocol": "TCP"
                                     }
+                                ],
+                                "volumeMounts": [
+                                    {
+                                        "name": "${APPLICATION_NAME}-storage",
+                                        "mountPath": "/opt/zeppelin/storage"
+                                    }
                                 ]
+                            }
+                        ],
+                        "volumes": [
+                            {
+                                "name": "${APPLICATION_NAME}-storage",
+                                "persistentVolumeClaim": {
+                                    "claimName": "${APPLICATION_NAME}"
+                                }
                             }
                         ]
                     }
