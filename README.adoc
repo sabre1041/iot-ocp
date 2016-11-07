@@ -86,5 +86,6 @@ image::images/zeppelin-importNote.png[width="750", height="300", align="center"]
 
 *Step 12:* Locate the *iot-ose* interpreter and drag it to top of the list (ensure the interpreter is enabled by clicking on it so that is highlighted in blue) and click **Save** to apply the changes
 
-*Step 13:* Execute all visualizations by hitting the play button on the top lefthand corner of the page next to the name of the note. 
-image::images/zeppelin-.png[width="750", height="300", align="center"]
+*Step 13:* Execute all visualizations by hitting the play button on the top lefthand corner of the page next to the name of the note
+
+image::images/Zeppelin-results.png[width="750", height="300", align="center"]
