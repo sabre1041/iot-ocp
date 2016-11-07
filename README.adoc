@@ -23,7 +23,7 @@ Red Hat JBoss Fuse Integration Services provides a set of tools and containerize
 
 _Note: The OpenShift environment can be enabled by CDK platform. To learn how to install CDK, check out https://github.com/redhatdemocentral/cdk-install-demo[CDK-Install Demo]_
 
-* OpenShift Command Line Interface (CLI) - Do we still need this?
+* OpenShift Command Line Interface (CLI)
 
 == Setup
 *Step 1:* Launch the OpenShift Container platform and login to OpenShift Command Line
@@ -39,11 +39,11 @@ The https://github.com/sabre1041/iot-ose/blob/master/init.sh[init.sh] script, pr
 
  [user@localhost ~]$ ./init.sh
  
-The init script triggers asynchronous builds and deployments of A-MQ, Decision Server, Fuse Integration Service, PostgreSQL, Zeppelin and Software Sensor components. OpenShift web console provides a graphical UI into the setup.
+The init script triggers synchronous builds and deployments of A-MQ, Decision Server, Fuse Integration Service, PostgreSQL, Zeppelin and Software Sensor components. OpenShift web console provides a graphical UI into the setup.
 
 *Step 4:* Login to the OpenShift web console using a web browser at 10.1.2.2:5443 (login/password - admin/admin) and select the **iot-ose** project
 
-image:/images/OSE-projects.png[width="500", height="400", align="center"]
+image::images/OSE-projects.png[width="500", height="400", align="center"]
 
 == Configure the Zeppelin visualization tool
 
@@ -55,11 +55,11 @@ image:/images/Zeppelin-service.png[width="500", height="400", align="center"]
 
 *Step 6:* Select *anonymous* username and click on **Interpreter**
 
-image:/images/zeppelin-interpreter.png[width="750", height="300", align="center"]
+image::images/zeppelin-interpreter.png[width="750", height="300", align="center"]
 
 *Step 7:* Create a new interpreter by selecting **Create** on the top right hand corner of the page
 
-image:/images/zeppelin-interpreter-create.png[width="750", height="300", align="center"]
+image::images/zeppelin-interpreter-create.png[width="750", height="300", align="center"]
 
 *Step 8:* Enter **iot-ose** as the name and select **psql** in the Interpreter group. Modify only the following values from default configuration and then **Save** to apply the changes
 
@@ -74,17 +74,17 @@ image:/images/zeppelin-interpreter-create.png[width="750", height="300", align="
 |postgresql.user |postgresiot
 |=========================================================
 
-image:/images/zepellin-interpreter-create-form.png[width="750", height="300", align="center"]
+image::images/zepellin-interpreter-create-form.png[width="750", height="300", align="center"]
 
 *Step 9:* Click on Zeppelin logo on the top left to return to the homepage
 
 *Step 10:* Under notebook, select **Import note** to import the pre-configured https://github.com/ishuverma/iot-ose/blob/master/support/zeppelin/iot-ose.json[iot-ose notebook]  
 
-image:/images/zeppelin-importNote.png[width="750", height="300", align="center"]
+image::images/zeppelin-importNote.png[width="750", height="300", align="center"]
 
 *Step 11:* Enable the *iot-ose* interpreter created earlier by selecting the gear on the top right corner of the page representing the **interpreter Binding**. 
 
 *Step 12:* Locate the *iot-ose* interpreter and drag it to top of the list (ensure the interpreter is enabled by clicking on it so that is highlighted in blue) and click **Save** to apply the changes
 
 *Step 13:* Execute all visualizations by hitting the play button on the top lefthand corner of the page next to the name of the note. 
-image:/images/zeppelin-.png[width="750", height="300", align="center"]
+image::images/zeppelin-.png[width="750", height="300", align="center"]
