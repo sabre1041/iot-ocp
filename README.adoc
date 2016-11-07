@@ -9,12 +9,12 @@ image::images/IoT-OSE-Containers.png[width="462", height="614", align=center]
 
 == Components
 
-* https://access.redhat.com/documentation/en/red-hat-xpaas/version-0/red-hat-xpaas-fuse-integration-services-image/[Fuse Integration Services]*
+- https://access.redhat.com/documentation/en/red-hat-xpaas/version-0/red-hat-xpaas-fuse-integration-services-image/[Fuse Integration Services]*
 Red Hat JBoss Fuse Integration Services provides a set of tools and containerized xPaaS images that enable development, deployment, and management of integration microservices within OpenShift.
-* https://access.redhat.com/documentation/en/red-hat-xpaas/0/paged/red-hat-xpaas-a-mq-image/[AMQ and MQTT]
-* https://access.redhat.com/documentation/en/red-hat-xpaas/0/paged/red-hat-xpaas-a-mq-image/[Realtime Decision Server]
-* https://zeppelin.apache.org/[Apache Zeppelin]
-* Simulated Software Sensor - Need a description
+- https://access.redhat.com/documentation/en/red-hat-xpaas/0/paged/red-hat-xpaas-a-mq-image/[AMQ and MQTT]
+- https://access.redhat.com/documentation/en/red-hat-xpaas/0/paged/red-hat-xpaas-a-mq-image/[Realtime Decision Server]
+- https://zeppelin.apache.org/[Apache Zeppelin]
+- Simulated Software Sensor - Need a description
 
 == Prerequisites
 
