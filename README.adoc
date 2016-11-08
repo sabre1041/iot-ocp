@@ -90,12 +90,14 @@ image::images/zeppelin-importNote.png[width="750", height="300", align="center"]
 
 image::images/Zeppelin-results.png[width="750", height="300", align="center"]
 
-== Shutting Down
+== Shutting Down Demo
 The demo can be shut down either by OpenShift CLI or OpenShift web console. Follow the following order to bring down the demo:
+
 *Software Sensor --> A-MQ --> Kie --> FIS --> Zeppelin --> Postgresql*
 
 == Bringing Demo Back Up
 The demo can be brought back up either using OpenShift CLI or OpenShift web console. Follow the following order to bring down the demo:
+
 *Postgresql --> A-MQ --> Kie --> FIS --> Software Sensor --> Zeppelin*
 
 
