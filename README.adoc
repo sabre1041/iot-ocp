@@ -9,8 +9,8 @@ image::images/IoT-OSE-Containers.png[width="462", height="614", align=center]
 
 == Components
 
-- https://access.redhat.com/documentation/en/red-hat-xpaas/version-0/red-hat-xpaas-fuse-integration-services-image/[Fuse Integration Services]*
-Red Hat JBoss Fuse Integration Services provides a set of tools and containerized xPaaS images that enable development, deployment, and management of integration microservices within OpenShift.
+- *https://access.redhat.com/documentation/en/red-hat-xpaas/version-0/red-hat-xpaas-fuse-integration-services-image/[JBOSS Fuse Integration Services]*
+Provides a set of tools and containerized xPaaS images that enable development, deployment, and management of integration microservices within OpenShift.
 - https://access.redhat.com/documentation/en/red-hat-xpaas/0/paged/red-hat-xpaas-a-mq-image/[AMQ and MQTT]
 - https://access.redhat.com/documentation/en/red-hat-xpaas/0/paged/red-hat-xpaas-a-mq-image/[Realtime Decision Server]
 - https://zeppelin.apache.org/[Apache Zeppelin]
@@ -89,3 +89,13 @@ image::images/zeppelin-importNote.png[width="750", height="300", align="center"]
 *Step 13:* Execute all visualizations by hitting the play button on the top lefthand corner of the page next to the name of the note
 
 image::images/Zeppelin-results.png[width="750", height="300", align="center"]
+
+== Shutting Down
+The demo can be shut down either by OpenShift CLI or OpenShift web console. Follow the following order to bring down the demo:
+*Software Sensor --> A-MQ --> Kie --> FIS --> Zeppelin --> Postgresql*
+
+== Bringing Demo Back Up
+The demo can be brought back up either using OpenShift CLI or OpenShift web console. Follow the following order to bring down the demo:
+*Postgresql --> A-MQ --> Kie --> FIS --> Software Sensor --> Zeppelin*
+
+
