@@ -1,7 +1,8 @@
 = IoT OpenShift Demo
 ===============
 
-This demo showcases Intelligent IoT Gateway on the Red Hat OpenShift Container Platform. The Intelligent IoT Gateway enables real time decision-making at the edge. OpenShift provides secure enterprise-grade container platform to accelerate IoT application delivery. Through the use of containers and microservices, this demo enables security, scalability and ease of deployment.
+This demo showcases Intelligent IoT Gateway on the Red Hat OpenShift Container Platform. The Intelligent IoT Gateway enables real time decision-making at the edge. OpenShift provides secure enterprise-grade container platform to accelerate IoT application delivery. Through the use of containers and microservices, this demo enables security, scalability and ease of deployment for IoT use case.
+
 
 image::images/IoT-OSE-Containers.png[width="462", height="614", align=center]
 
@@ -10,11 +11,17 @@ image::images/IoT-OSE-Containers.png[width="462", height="614", align=center]
 == Components
 
 - *https://access.redhat.com/documentation/en/red-hat-xpaas/version-0/red-hat-xpaas-fuse-integration-services-image/[JBOSS Fuse Integration Services]*
-Provides a set of tools and containerized xPaaS images that enable development, deployment, and management of integration microservices within OpenShift.
-- https://access.redhat.com/documentation/en/red-hat-xpaas/0/paged/red-hat-xpaas-a-mq-image/[AMQ and MQTT]
-- https://access.redhat.com/documentation/en/red-hat-xpaas/0/paged/red-hat-xpaas-a-mq-image/[Realtime Decision Server]
-- https://zeppelin.apache.org/[Apache Zeppelin]
-- Simulated Software Sensor - Need a description
+ A set of tools and container images that enable development, deployment, and management of microservices within OpenShift.
+- *https://access.redhat.com/documentation/en/red-hat-xpaas/0/paged/red-hat-xpaas-a-mq-image/[JBOSS A-MQ]*
+A-MQ message broker container image for communicating with Sensor using MQTT protocol
+- *https://access.redhat.com/documentation/en/red-hat-xpaas/0/paged/red-hat-xpaas-decision-server-image/chapter-1-introduction-to-the-decision-server-image/[JBOSS BRMS Decision Server]*
+Container image of the decision platform for executing realtime business rules
+- *https://zeppelin.apache.org/[Apache Zeppelin]*
+Container image of the tool for interactive data analytics.
+- *https://www.postgresql.org/[PostgreSQL]*
+Container image of the database for storing sensor data
+- *Simulated Software Sensor*
+Spring boot based software app simulating temperature, vibration and GPS sensor data
 
 == Prerequisites
 
@@ -47,7 +54,7 @@ image::images/OSE-projects.png[width="500", height="400", align="center"]
 
 == Configure the Zeppelin visualization tool
 
-We're using Apache Zeppelin tool for interactive data analytics. The data visualization is stored in Notebooks. The interpreters allows Zeppelin to connect with Postgresql-backend.
+The data visualization is stored in Notebooks. The interpreters allows Zeppelin to connect with Postgresql-backend.
 
 *Step 5:* Locate the *Zeppelin* service on the overview page and click on its url to launch the Zeppelin web console
 
