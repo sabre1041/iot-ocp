@@ -160,6 +160,16 @@
                         }
                     }
                 },
+                "resources": {
+                    "limits": {
+                        "cpu": "200m",
+                        "memory": "200Mi"
+                    },
+                    "requests": {
+                        "cpu": "150m",
+                        "memory": "100Mi"
+                    }
+                },
                 "output": {
                     "to": {
                         "kind": "ImageStreamTag",
@@ -246,6 +256,25 @@
                                         "protocol": "TCP"
                                     }
                                 ],
+                                "resources": {
+                                    "limits": {
+                                        "cpu": "200m",
+                                        "memory": "500Mi"
+                                    },
+                                    "requests": {
+                                        "cpu": "150m",
+                                        "memory": "400Mi"
+                                    }
+                                },
+                                "readinessProbe": {
+                                    "httpGet": {
+                                        "path": "/index.html",
+                                        "port": 8080,
+                                        "scheme": "HTTP"
+                                    },
+                                    "initialDelaySeconds": 30,
+                                    "timeoutSeconds": 5
+                                },
                                 "volumeMounts": [
                                     {
                                         "name": "${APPLICATION_NAME}-storage",

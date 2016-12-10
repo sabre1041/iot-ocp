@@ -200,13 +200,22 @@
             ]
           }
         },
+        "resources": {
+            "limits": {
+                "cpu": "400m",
+                "memory": "768Mi"
+            },
+            "requests": {
+                "cpu": "200m",
+                "memory": "256Mi"
+            }
+        },
         "output": {
           "to": {
             "kind": "ImageStreamTag",
             "name": "${APP_NAME}:latest"
           }
-        },
-        "resources": {}
+        }
       },
       "status": {
         "lastVersion": 0
@@ -286,6 +295,16 @@
                     "name": "jolokia"
                   }
                 ],
+                "resources": {
+                    "limits": {
+                        "cpu": "500m",
+                        "memory": "1536Mi"
+                    },
+                    "requests": {
+                        "cpu": "500m",
+                        "memory": "1Gi"
+                    }
+                },
                 "env": [
                   {
                       "name": "KIE_APP_USER",

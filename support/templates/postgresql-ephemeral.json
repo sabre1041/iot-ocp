@@ -127,7 +127,12 @@
                                 ],
                                 "resources": {
                                     "limits": {
+                                        "cpu": "200m",
                                         "memory": "${MEMORY_LIMIT}"
+                                    },
+                                    "requests": {
+                                        "cpu": "200m",
+                                        "memory": "512Mi"
                                     }
                                 },
                                 "volumeMounts": [
