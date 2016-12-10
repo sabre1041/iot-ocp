@@ -1,0 +1,49 @@
+package com.redhat.examples.iot.datacenter.monitor
+ 
+import com.redhat.examples.iot.businessRules.Measure;
+
+
+rule "OrganTemperatureTooHigh"
+	lock-on-active true
+	when
+		$t : Measure( category == "Organ", dataType == "temperature", payload != null, Double.parseDouble(payload) >= 70 )
+	then
+		System.out.println("Rule 'high temperature' fired as temperature is " + $t.getPayload());
+		$t.setErrorCode(1);
+		$t.setErrorMessage("Temperature too high");
+		update( $t );
+end 
+
+
+rule "OrganVibrationTooHigh"
+	lock-on-active true
+	when
+		$t : Measure( category == "Organ", dataType == "vibration", payload != null, Double.parseDouble(payload) >= 15 )
+	then
+		System.out.println("Rule 'high vibration' fired as vibration is " + $t.getPayload());
+		$t.setErrorCode(1);
+		$t.setErrorMessage("Vibration too high");
+		update( $t );
+end 
+
+rule "MachineTemperatureTooHigh"
+	lock-on-active true
+	when
+		$t : Measure( category == "Machine", dataType == "temperature", payload != null, Double.parseDouble(payload) >= 100 )
+	then
+		System.out.println("Rule 'high temperature' fired as temperature is " + $t.getPayload());
+		$t.setErrorCode(1);
+		$t.setErrorMessage("Temperature too high");
+		update( $t );
+end 
+
+rule "MachineVibrationTooHigh"
+	lock-on-active true
+	when
+		$t : Measure( category == "Machine", dataType == "vibration", payload != null, Double.parseDouble(payload) >= 10 )
+	then
+		System.out.println("Rule 'high vibration' fired as vibration is " + $t.getPayload());
+		$t.setErrorCode(1);
+		$t.setErrorMessage("Vibration too high");
+		update( $t );
+end 

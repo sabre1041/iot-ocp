@@ -1,7 +1,7 @@
-= IoT OpenShift Demo
+= IoT OpenShift Example Project
 ===============
 
-This demo showcases Intelligent IoT Gateway on the Red Hat OpenShift Container Platform. The Intelligent IoT Gateway enables real time decision-making at the edge. OpenShift provides secure enterprise-grade container platform to accelerate IoT application delivery. Through the use of containers and microservices, this demo enables security, scalability and ease of deployment for IoT use case.
+This example showcases Intelligent IoT Gateway on the Red Hat OpenShift Container Platform. The Intelligent IoT Gateway enables real time decision-making at the edge. OpenShift provides secure enterprise-grade container platform to accelerate IoT application delivery. Through the use of containers and microservices, this example enables security, scalability and ease of deployment for IoT use case.
 
 
 image::images/IoT-OSE-Containers.png[width="462", height="614", align=center]
@@ -39,7 +39,7 @@ _Note: The OpenShift environment can be enabled by CDK platform. To learn how to
  [user@localhost ~]$ git clone https://github.com/sabre1041/iot-ose.git
 
 
-The https://github.com/sabre1041/iot-ose/blob/master/init.sh[init.sh] script, provided with the project, automates the provisioning process for the demo.
+The https://github.com/sabre1041/iot-ose/blob/master/init.sh[init.sh] script, provided with the project, automates the provisioning process for the example project.
 
 *Step 3:* Execute the init script
 
@@ -96,13 +96,13 @@ image::images/zeppelin-importNote.png[width="750", height="300", align="center"]
 
 image::images/Zeppelin-results.png[width="750", height="300", align="center"]
 
-== Shutting Down Demo
-The demo can be shut down either by OpenShift CLI or OpenShift web console. Follow the following order to bring down the demo:
+== Shutting Down Example Project
+The example project can be shut down either by OpenShift CLI or OpenShift web console. Follow the following order to bring down the example project:
 
 *Software Sensor -> A-MQ -> Kie -> FIS -> Zeppelin -> Postgresql*
 
-== Bringing Demo Back Up
-The demo can be brought back up either using OpenShift CLI or OpenShift web console. Follow the following order to bring down the demo:
+== Bringing Example Project Back Up
+The example project can be brought back up either using OpenShift CLI or OpenShift web console. Follow the following order to bring down the example project:
 
 *Postgresql -> A-MQ -> Kie -> FIS -> Software Sensor -> Zeppelin*
 

@@ -8,9 +8,9 @@
        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
 	<!--Helper Bean to extract data from MQTT Topic and and to Message in csv values  -->
-  	<bean id="myHelper" class="com.redhat.demo.iotdemo.routingService.MyHelper" />
+  	<bean id="myHelper" class="com.redhat.examples.iot.routingService.MyHelper" />
   	
-  	<bean id="rules" class="com.redhat.demo.iotdemo.routingService.BusinessRulesBean" init-method="init" />
+  	<bean id="rules" class="com.redhat.examples.iot.routingService.BusinessRulesBean" init-method="init" />
   	
   	<!-- this is the JDBC data source which uses a PostgreSQL database -->
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
@@ -40,11 +40,11 @@
   <propertyPlaceholder id="properties" location="sql.properties"/>
     
   <dataFormats>
-    <bindy type="Csv" classType="com.redhat.demo.iotdemo.routingService.Measure" id="bindyDataFormat"/>
+    <bindy type="Csv" classType="com.redhat.examples.iot.routingService.Measure" id="bindyDataFormat"/>
   </dataFormats>
   <route id="messagesFromSensor">
   <from uri="mqtt:mqtt.temp.receiver?host=tcp://{{env:BROKER_AMQ_MQTT_SERVICE_HOST}}:{{env:BROKER_AMQ_MQTT_SERVICE_PORT}}&amp;subscribeTopicNames=iot-ose/#/#/#&amp;userName={{env:BROKER_AMQ_USERNAME}}&amp;password={{env:BROKER_AMQ_PASSWORD}}"/>
-    <bean ref="myHelper" method="enhanceMessage" beanType="com.redhat.demo.routingService.MyHelper"/>
+    <bean ref="myHelper" method="enhanceMessage" beanType="com.redhat.examples.iot.routingService.MyHelper"/>
     <unmarshal ref="bindyDataFormat"/>
     <log message="Mesaure of type ${body.dataType} received with value ${body.payload}"/>
     <convertBodyTo type="java.lang.String"/>
