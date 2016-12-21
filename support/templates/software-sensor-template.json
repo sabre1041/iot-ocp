@@ -131,16 +131,6 @@
                         "name": "${APPLICATION_NAME}:latest"
                     }
                 },
-                "resources": {
-                    "limits": {
-                        "cpu": "200m",
-                        "memory": "768Mi"
-                    },
-                    "requests": {
-                        "cpu": "200m",
-                        "memory": "256Mi"
-                    }
-                },
                 "triggers": [
                     {
                         "type": "GitHub",
@@ -221,16 +211,6 @@
                                         "protocol": "TCP"
                                     }
                                 ],
-                                "resources": {
-                                    "limits": {
-                                        "cpu": "200m",
-                                        "memory": "400Mi"
-                                    },
-                                    "requests": {
-                                        "cpu": "200m",
-                                        "memory": "256Mi"
-                                    }
-                                },
 		                        "env": [
 		                            {
 		                                "name": "KUBERNETES_NAMESPACE",
