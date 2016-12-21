@@ -207,16 +207,6 @@
                                         "protocol": "TCP"
                                     }
                                 ],
-                                "resources": {
-                                    "limits": {
-                                        "cpu": "500m",
-                                        "memory": "768Mi"
-                                    },
-                                    "requests": {
-                                        "cpu": "300m",
-                                        "memory": "512Mi"
-                                    }
-                                },
                                 "env": [
                                     {
                                         "name": "AMQ_USER",

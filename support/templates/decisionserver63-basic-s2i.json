@@ -194,16 +194,6 @@
                         }
                     }
                 },
-                "resources": {
-                    "limits": {
-                        "cpu": "300m",
-                        "memory": "768Mi"
-                    },
-                    "requests": {
-                        "cpu": "200m",
-                        "memory": "256Mi"
-                    }
-                },
                 "output": {
                     "to": {
                         "kind": "ImageStreamTag",
@@ -313,16 +303,6 @@
                                         "protocol": "TCP"
                                     }
                                 ],
-                                "resources": {
-                                    "limits": {
-                                        "cpu": "300m",
-                                        "memory": "768Mi"
-                                    },
-                                    "requests": {
-                                        "cpu": "200m",
-                                        "memory": "256Mi"
-                                    }
-                                },
                                 "env": [
                                     {
                                         "name": "KIE_CONTAINER_DEPLOYMENT",

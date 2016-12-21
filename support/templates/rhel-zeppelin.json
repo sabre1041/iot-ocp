@@ -160,16 +160,6 @@
                         }
                     }
                 },
-                "resources": {
-                    "limits": {
-                        "cpu": "200m",
-                        "memory": "200Mi"
-                    },
-                    "requests": {
-                        "cpu": "150m",
-                        "memory": "100Mi"
-                    }
-                },
                 "output": {
                     "to": {
                         "kind": "ImageStreamTag",
@@ -256,16 +246,6 @@
                                         "protocol": "TCP"
                                     }
                                 ],
-                                "resources": {
-                                    "limits": {
-                                        "cpu": "200m",
-                                        "memory": "500Mi"
-                                    },
-                                    "requests": {
-                                        "cpu": "150m",
-                                        "memory": "400Mi"
-                                    }
-                                },
                                 "readinessProbe": {
                                     "httpGet": {
                                         "path": "/index.html",
