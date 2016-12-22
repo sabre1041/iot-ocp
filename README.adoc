@@ -59,43 +59,19 @@ The data visualization is stored in Notebooks. The interpreters allows Zeppelin 
 
 image::images/Zeppelin-service.png[width="500", height="400", align="center"]
 
-*Step 6:* Select *anonymous* username and click on **Interpreter**
-
-image::images/zeppelin-interpreter.png[width="750", height="300", align="center"]
-
-*Step 7:* Create a new interpreter by selecting **Create** on the top right hand corner of the page
-
-image::images/zeppelin-interpreter-create.png[width="750", height="300", align="center"]
-
-*Step 8:* Enter **iot-ose** as the name and select **psql** in the Interpreter group. Modify only the following values from default configuration and then **Save** to apply the changes
-
-[width="50%",cols="2,^2",options="header"]
-|=========================================================
-|Name |Value
-
-|postgresql.password |postgresiot
-
-|postgresql.url |jdbc:postgresql://postgresql:5432/iot
-
-|postgresql.user |postgresiot
-|=========================================================
-
-image::images/zepellin-interpreter-create-form.png[width="750", height="300", align="center"]
-
-*Step 9:* Click on Zeppelin logo on the top left to return to the homepage
-
-*Step 10:* Under notebook, select **Import note** to import the pre-configured https://github.com/ishuverma/iot-ose/blob/master/support/zeppelin/iot-ose.json[iot-ose notebook]  
+*Step 6:* Under notebook, select **Import note** to import the pre-configured https://github.com/ishuverma/iot-ose/blob/master/support/zeppelin/iot-ose.json[iot-ose notebook]  
 
 image::images/zeppelin-importNote.png[width="750", height="300", align="center"]
 
-*Step 11:* Enable the *iot-ose* interpreter created earlier by selecting the gear on the top right corner of the page representing the **interpreter Binding**. 
 
-*Step 12:* Locate the *iot-ose* interpreter and drag it to top of the list (ensure the interpreter is enabled by clicking on it so that is highlighted in blue) and click **Save** to apply the changes
-
-*Step 13:* Execute all visualizations by hitting the play button on the top lefthand corner of the page next to the name of the note
+*Step 7:* Execute all visualizations by hitting the play button on the top lefthand corner of the page next to the name of the note
 
 image::images/Zeppelin-results.png[width="750", height="300", align="center"]
 
+
+*Step 8:* Periodically refresh the note data through chron scheduler
+
+image::images/zeppelin-note-chron.png[width="750", height="300", align="center"]
 == Shutting Down Example Project
 The example project can be shut down either by OpenShift CLI or OpenShift web console. Follow the following order to bring down the example project:
 
