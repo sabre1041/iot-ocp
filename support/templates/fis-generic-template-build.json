@@ -205,8 +205,7 @@
             "kind": "ImageStreamTag",
             "name": "${APP_NAME}:latest"
           }
-        },
-        "resources": {}
+        }
       },
       "status": {
         "lastVersion": 0
