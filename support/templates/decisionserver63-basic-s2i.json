@@ -18,7 +18,7 @@
         {
             "description": "The KIE Container deployment configuration in format: containerId=groupId:artifactId:version|c2=g2:a2:v2",
             "name": "KIE_CONTAINER_DEPLOYMENT",
-            "value": "iot-ose-businessrules-service=com.redhat.demo.iotdemo:iot-ose-businessrules-service:0.0.1-SNAPSHOT",
+            "value": "iot-ose-businessrules-service=com.redhat.examples.iot:iot-ose-businessrules-service:0.0.1-SNAPSHOT",
             "required": false
         },
         {

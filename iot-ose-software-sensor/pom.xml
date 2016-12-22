@@ -3,13 +3,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.redhat.demo.iot</groupId>
+	<groupId>com.redhat.examples.iot</groupId>
 	<artifactId>iot-ose-software-sensor</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>demo</name>
-	<description>Demo project for Spring Boot</description>
+	<name>IoT Software Sensor</name>
+	<description>Simulated Software Sensor for IoT Example Project</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>

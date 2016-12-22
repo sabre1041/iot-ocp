@@ -85,30 +85,6 @@
             "spec": {
                 "ports": [
                     {
-                        "port": 5672,
-                        "targetPort": 5672
-                    }
-                ],
-                "selector": {
-                    "deploymentConfig": "${APPLICATION_NAME}-amq"
-                }
-            },
-            "metadata": {
-                "name": "${APPLICATION_NAME}-amq-amqp",
-                "labels": {
-                    "application": "${APPLICATION_NAME}"
-                },
-                "annotations": {
-                    "description": "The broker's AMQP port."
-                }
-            }
-        },
-        {
-            "kind": "Service",
-            "apiVersion": "v1",
-            "spec": {
-                "ports": [
-                    {
                         "port": 1883,
                         "targetPort": 1883
                     }
@@ -124,30 +100,6 @@
                 },
                 "annotations": {
                     "description": "The broker's MQTT port."
-                }
-            }
-        },
-        {
-            "kind": "Service",
-            "apiVersion": "v1",
-            "spec": {
-                "ports": [
-                    {
-                        "port": 61613,
-                        "targetPort": 61613
-                    }
-                ],
-                "selector": {
-                    "deploymentConfig": "${APPLICATION_NAME}-amq"
-                }
-            },
-            "metadata": {
-                "name": "${APPLICATION_NAME}-amq-stomp",
-                "labels": {
-                    "application": "${APPLICATION_NAME}"
-                },
-                "annotations": {
-                    "description": "The broker's STOMP port."
                 }
             }
         },
@@ -245,18 +197,8 @@
                                         "protocol": "TCP"
                                     },
                                     {
-                                        "name": "amqp",
-                                        "containerPort": 5672,
-                                        "protocol": "TCP"
-                                    },
-                                    {
                                         "name": "mqtt",
                                         "containerPort": 1883,
-                                        "protocol": "TCP"
-                                    },
-                                    {
-                                        "name": "stomp",
-                                        "containerPort": 61613,
                                         "protocol": "TCP"
                                     },
                                     {

@@ -6,6 +6,7 @@ MQ_USER="iotuser"
 MQ_PASSWORD="iotuser"
 KIE_USER="kieuser"
 KIE_PASSWORD="kieuser1!"
+GIT_BRANCH="master"
 POSTGRESQL_APP_NAME="postgresql"
 POSTGRESQL_USERNAME="postgresiot"
 POSTGRESQL_PASSWORD="postgresiot"
@@ -189,7 +190,7 @@ function validate_build_deploy() {
 
 
 
-echo "Setting up OpenShift IoT Demo"
+echo "Setting up OpenShift IoT Example Project"
 
 echo
 echo "Creating Project: ${IOT_OSE_PROJECT}..."
@@ -214,7 +215,7 @@ echo
 oc import-image -n ${IOT_OSE_PROJECT} jboss-decisionserver63-openshift --all=true
 oc import-image -n ${IOT_OSE_PROJECT} jboss-amq-62 --all=true
 oc import-image -n ${IOT_OSE_PROJECT} fis-karaf-openshift --all=true
-oc import-image -n ${IOT_OSE_PROJECT} rhel --all=true
+oc import-image -n ${IOT_OSE_PROJECT} rhel7 --all=true
 
 echo
 echo "Deploying PostgreSQL..."
@@ -257,31 +258,43 @@ oc expose svc -n ${IOT_OSE_PROJECT} broker-amq-mqtt
 echo
 echo "Deploying Decision Server..."
 echo
-oc process -v=KIE_SERVER_USER="${KIE_USER}",KIE_SERVER_PASSWORD="${KIE_PASSWORD}",IMAGE_STREAM_NAMESPACE=${IOT_OSE_PROJECT} -f ${SCRIPT_BASE_DIR}/support/templates/decisionserver63-basic-s2i.json | oc create -n ${IOT_OSE_PROJECT} -f-
+oc process -v=KIE_SERVER_USER="${KIE_USER}",KIE_SERVER_PASSWORD="${KIE_PASSWORD}",IMAGE_STREAM_NAMESPACE=${IOT_OSE_PROJECT},SOURCE_REPOSITORY_REF=${GIT_BRANCH} -f ${SCRIPT_BASE_DIR}/support/templates/decisionserver63-basic-s2i.json | oc create -n ${IOT_OSE_PROJECT} -f-
 
 validate_build_deploy "kie-app"
 
 echo
 echo "Deploying FIS Application..."
 echo
-oc process -v=KIE_APP_USER="${KIE_USER}",KIE_APP_PASSWORD="${KIE_PASSWORD}",BROKER_AMQ_USERNAME="${MQ_USER}",BROKER_AMQ_PASSWORD="${MQ_PASSWORD}",IMAGE_STREAM_NAMESPACE=${IOT_OSE_PROJECT},POSTGRESQL_USER=${POSTGRESQL_USERNAME},POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD},POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE} -f ${SCRIPT_BASE_DIR}/support/templates/fis-generic-template-build.json | oc create -n ${IOT_OSE_PROJECT} -f-
+oc process -v=KIE_APP_USER="${KIE_USER}",KIE_APP_PASSWORD="${KIE_PASSWORD}",GIT_REF=${GIT_BRANCH},BROKER_AMQ_USERNAME="${MQ_USER}",BROKER_AMQ_PASSWORD="${MQ_PASSWORD}",IMAGE_STREAM_NAMESPACE=${IOT_OSE_PROJECT},POSTGRESQL_USER=${POSTGRESQL_USERNAME},POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD},POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE} -f ${SCRIPT_BASE_DIR}/support/templates/fis-generic-template-build.json | oc create -n ${IOT_OSE_PROJECT} -f-
 
 validate_build_deploy "fis-app"
 
 echo
 echo "Deploying Software Sensor Application..."
 echo
-oc process -v=MQTT_USERNAME="${MQ_USER}",MQTT_PASSWORD="${MQ_PASSWORD}" -f ${SCRIPT_BASE_DIR}/support/templates/software-sensor-template.json | oc create -n ${IOT_OSE_PROJECT} -f-
+oc process -v=MQTT_USERNAME="${MQ_USER}",MQTT_PASSWORD="${MQ_PASSWORD}",SOURCE_REPOSITORY_REF=${GIT_BRANCH} -f ${SCRIPT_BASE_DIR}/support/templates/software-sensor-template.json | oc create -n ${IOT_OSE_PROJECT} -f-
 
 validate_build_deploy "software-sensor"
 
 echo
 echo "Deploying Visualization Tool..."
 echo
-oc process -f ${SCRIPT_BASE_DIR}/support/templates/rhel-zeppelin.json | oc create -n ${IOT_OSE_PROJECT} -f-
+oc process -v=SOURCE_REPOSITORY_REF=${GIT_BRANCH} -f ${SCRIPT_BASE_DIR}/support/templates/rhel-zeppelin.json | oc create -n ${IOT_OSE_PROJECT} -f-
 
 validate_build_deploy "rhel-zeppelin"
 
+sleep 10
+
 echo
-echo "OpenShift IoT Demo Setup Complete."
+echo "Adding IOT Postgresql Interperter"
+echo
+
+# Get Route
+ZEPPELIN_ROUTE=$(oc get routes rhel-zeppelin --template='{{ .spec.host }}')
+
+curl -s --fail -H "Content-Type: application/json" -X POST -d "{\"name\":\"iot-ose\",\"group\":\"psql\",\"properties\":{\"postgresql.password\":\"${POSTGRESQL_PASSWORD}\",\"postgresql.max.result\":\"1000\",\"postgresql.user\":\"${POSTGRESQL_USERNAME}\",\"postgresql.url\":\"jdbc:postgresql://postgresql:5432/iot\",\"postgresql.driver.name\":\"org.postgresql.Driver\"},\"dependencies\":[],\"option\":{\"remote\":true,\"isExistingProcess\":false,\"perNoteSession\":false,\"perNoteProcess\":false},\"propertyValue\":\"\",\"propertyKey\":\"\"}" http://${ZEPPELIN_ROUTE}/api/interpreter/setting
+
+echo
+echo
+echo "OpenShift IoT Example Project Setup Complete."
 echo
