@@ -1,85 +1,81 @@
 = IoT OpenShift Example Project
 ===============
 
-This example showcases Intelligent IoT Gateway on the Red Hat OpenShift Container Platform. The Intelligent IoT Gateway enables real time decision-making at the edge. OpenShift provides secure enterprise-grade container platform to accelerate IoT application delivery. Through the use of containers and microservices, this example enables security, scalability and ease of deployment for IoT use case.
+This example showcases an Intelligent Internet-of-Things (IoT) Gateway on https://www.openshift.com/container-platform/[Red Hat's OpenShift Container Platform].  The Gateway enables real-time decision making at the edge, and demonstrates the ease with which you can deploy a secure and scalable microservice application on the enterprise-grade OpenShift application platform.
 
-
-image::images/IoT-OSE-Containers.png[width="462", height="614", align=center]
+image::images/IoT-OSE-Containers.png[height="400", align="center"]
 
 *Please note: This repository is currently under development and the feature set/components are subject to change without notice*
 
 == Components
 
-- *https://access.redhat.com/documentation/en/red-hat-xpaas/version-0/red-hat-xpaas-fuse-integration-services-image/[JBOSS Fuse Integration Services]*
- A set of tools and container images that enable development, deployment, and management of microservices within OpenShift.
-- *https://access.redhat.com/documentation/en/red-hat-xpaas/0/paged/red-hat-xpaas-a-mq-image/[JBOSS A-MQ]*
-A-MQ message broker container image for communicating with Sensor using MQTT protocol
-- *https://access.redhat.com/documentation/en/red-hat-xpaas/0/paged/red-hat-xpaas-decision-server-image/chapter-1-introduction-to-the-decision-server-image/[JBOSS BRMS Decision Server]*
-Container image of the decision platform for executing realtime business rules
-- *https://zeppelin.apache.org/[Apache Zeppelin]*
-Container image of the tool for interactive data analytics.
-- *https://www.postgresql.org/[PostgreSQL]*
-Container image of the database for storing sensor data
-- *Simulated Software Sensor*
-Spring boot based software app simulating temperature, vibration and GPS sensor data
+The application is deployed as a set of microservices inside containers on OpenShift:
+
+- *https://access.redhat.com/documentation/en/red-hat-xpaas/version-0/red-hat-xpaas-fuse-integration-services-image/[JBoss Fuse Integration Services]* (FIS): Tools that facilitate integration, routing, and transformation of messages and protocols, by leveraging http://camel.apache.org[Apache Camel] technology.
+- *https://access.redhat.com/documentation/en/red-hat-xpaas/0/paged/red-hat-xpaas-a-mq-image/[JBoss A-MQ]*: Apache ActiveMQ-based message broker container image for receiving and storing telemetry from the Sensor via http://mqtt.org/[MQTT]
+- *https://access.redhat.com/documentation/en/red-hat-xpaas/0/paged/red-hat-xpaas-decision-server-image/chapter-1-introduction-to-the-decision-server-image/[JBoss BRMS Decision Server]*: Real-time execution of business rules for processing telemetry
+- *https://zeppelin.apache.org/[Apache Zeppelin]*: Interactive data visualization and analytics
+- *https://www.postgresql.org/[PostgreSQL]*: Provides persistence for sensor data
+- *Simulated Software Sensor*: A simple Spring Boot application that simulates temperature, vibration, and GPS sensor data
 
 == Prerequisites
 
-* Git
+* https://git-scm.com/[Git]
+* https://github.com/openshift/origin/releases[OpenShift command-line tools] for your platform
 * Access to an OpenShift environment
-* OpenShift Command Line Interface (CLI)
 
 == Setup
-*Step 1:* Launch the OpenShift Container platform and login to OpenShift Command Line
 
-_Note: The OpenShift environment can be enabled by CDK platform. To learn how to install CDK, check out https://github.com/redhatdemocentral/cdk-install-demo[CDK-Install Demo]_
+*Step 1:* Login to your OpenShift environment using the command-line tools
 
-*Step 2:* Download the iot-ose project in the OpenShift instance:
+_Note: If you don't have an environment handy, the https://developers.redhat.com/products/cdk/overview/[Red Hat Container Development Kit] provides a fully-functional preconfigured OpenShift environment, including Red Hat Enterprise Linux (RHEL) and JBoss, delivered as a Virtual Machine image_
 
- [user@localhost ~]$ git clone https://github.com/sabre1041/iot-ose.git
+*Step 2:* Download the iot-ocp project in the OpenShift instance:
 
-
-The https://github.com/sabre1041/iot-ose/blob/master/init.sh[init.sh] script, provided with the project, automates the provisioning process for the example project.
+ $ git clone https://github.com/sabre1041/iot-ocp.git
 
 *Step 3:* Execute the init script
 
- [user@localhost ~]$ ./init.sh
- 
-The init script triggers synchronous builds and deployments of A-MQ, Decision Server, Fuse Integration Service, PostgreSQL, Zeppelin and Software Sensor components. OpenShift web console provides a graphical UI into the setup.
+ $ cd iot-ocp
+ $ ./init.sh
 
-*Step 4:* Login to the OpenShift web console using a web browser (login/password - admin/admin) and select the **iot-ose** project
+The script automatically builds, deploys, and wires the necessary application components together.  Once the process is complete, you can see a graphical visualization of the application architecture using the OpenShift Web Console.
 
-image::images/OSE-projects.png[width="500", height="400", align="center"]
+*Step 4:* Login to the OpenShift web console using a web browser
+
+**Username**: admin
+**Password**: admin
+**Project**: iot-ocp
+
+image::images/OSE-projects.png[width="500", align="center"]
 
 == Configure the Zeppelin visualization tool
 
-The data visualization is stored in Notebooks. The interpreters allows Zeppelin to connect with Postgresql-backend.
+The data visualization is stored in Notebooks. The interpreters allow Zeppelin to connect to PostgreSQL.
 
 *Step 5:* Locate the *Zeppelin* service on the overview page and click on its url to launch the Zeppelin web console
 
-image::images/Zeppelin-service.png[width="500", height="400", align="center"]
+image::images/Zeppelin-service.png[align="center"]
 
-*Step 6:* Under notebook, select **Import note** to import the pre-configured https://github.com/ishuverma/iot-ose/blob/master/support/zeppelin/iot-ose.json[iot-ose notebook]  
+*Step 6:* Under notebook, select **Import note** to import the pre-configured https://github.com/ishuverma/iot-ose/blob/master/support/zeppelin/iot-ose.json[iot-ose notebook]
 
-image::images/zeppelin-importNote.png[width="750", height="300", align="center"]
+image::images/zeppelin-importNote.png[align="center"]
 
+*Step 7:* Execute all visualizations by hitting the "Play" button on the top lefthand corner of the page next to the name of the note
 
-*Step 7:* Execute all visualizations by hitting the play button on the top lefthand corner of the page next to the name of the note
-
-image::images/Zeppelin-results.png[width="750", height="300", align="center"]
-
+image::images/Zeppelin-results.png[align="center"]
 
 *Step 8:* Periodically refresh the note data through cron scheduler
 
-image::images/zeppelin-note-chron.png[width="750", height="300", align="center"]
-== Shutting Down Example Project
-The example project can be shut down either by OpenShift CLI or OpenShift web console. Follow the following order to bring down the example project:
+image::images/zeppelin-note-chron.png[align="center"]
 
-*Software Sensor -> A-MQ -> Kie -> FIS -> Zeppelin -> Postgresql*
+== Starting the Gateway
 
-== Bringing Example Project Back Up
-The example project can be brought back up either using OpenShift CLI or OpenShift web console. Follow the following order to bring down the example project:
+To bring the project back up, the components should be _started_ in the following order:
 
-*Postgresql -> A-MQ -> Kie -> FIS -> Software Sensor -> Zeppelin*
-
-
+0. PostgreSQL
+0. JBoss A-MQ
+0. Kie
+0. JBoss Fuse Integration Services (FIS)
+0. Simulated Software Sensor
+0. Apache Zeppelin
