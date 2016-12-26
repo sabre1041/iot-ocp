@@ -1,11 +1,9 @@
 = IoT OpenShift Example Project
 ===============
 
-This example showcases an Intelligent Internet-of-Things (IoT) Gateway on https://www.openshift.com/container-platform/[Red Hat's OpenShift Container Platform].  The Gateway enables real-time decision making at the edge, and demonstrates the ease with which you can deploy a secure and scalable microservice application on the enterprise-grade OpenShift application platform.
+This example showcases an Intelligent Internet-of-Things (IoT) Gateway on https://www.openshift.com/container-platform/[Red Hat's OpenShift Container Platform].  The Gateway enables real-time decision making at the edge, and demonstrates the ease with which you can deploy a secure and scalable microservices application on the enterprise-grade OpenShift application platform.
 
-image::images/IoT-OSE-Containers.png[height="400", align="center"]
-
-*Please note: This repository is currently under development and the feature set/components are subject to change without notice*
+image::images/IoT-OCP-Containers.png[height="400", align="center"]
 
 == Components
 
@@ -23,6 +21,7 @@ The application is deployed as a set of microservices inside containers on OpenS
 * https://git-scm.com/[Git]
 * https://github.com/openshift/origin/releases[OpenShift command-line tools] for your platform
 * Access to an OpenShift environment
+* Two (2) available https://docs.openshift.com/container-platform/latest/dev_guide/persistent_volumes.html[Persistent Volumes]
 
 == Setup
 
@@ -49,7 +48,7 @@ The script automatically builds, deploys, and wires the necessary application co
 
 **Project**: iot-ocp
 
-image::images/OSE-projects.png[width="500", align="center"]
+image::images/OCP-projects.png[width="500", align="center"]
 
 == Configure the Zeppelin visualization tool
 
@@ -59,7 +58,7 @@ The data visualization is stored in Notebooks. The interpreters allow Zeppelin t
 
 image::images/Zeppelin-service.png[align="center"]
 
-*Step 6:* Under notebook, select **Import note** to import the pre-configured https://github.com/ishuverma/iot-ose/blob/master/support/zeppelin/iot-ose.json[iot-ose notebook]
+*Step 6:* Under notebook, select **Import note** to import the pre-configured link:support/zeppelin/iot-ocp.json[iot-ocp notebook]
 
 image::images/zeppelin-importNote.png[align="center"]
 

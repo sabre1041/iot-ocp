@@ -18,7 +18,7 @@
         {
             "description": "The KIE Container deployment configuration in format: containerId=groupId:artifactId:version|c2=g2:a2:v2",
             "name": "KIE_CONTAINER_DEPLOYMENT",
-            "value": "iot-ose-businessrules-service=com.redhat.examples.iot:iot-ose-businessrules-service:0.0.1-SNAPSHOT",
+            "value": "iot-ocp-businessrules-service=com.redhat.examples.iot:iot-ocp-businessrules-service:0.0.1-SNAPSHOT",
             "required": false
         },
         {
@@ -49,7 +49,7 @@
         {
             "description": "Git source URI for application",
             "name": "SOURCE_REPOSITORY_URL",
-            "value": "https://github.com/sabre1041/iot-ose.git",
+            "value": "https://github.com/sabre1041/iot-ocp.git",
             "required": true
         },
         {
@@ -61,7 +61,7 @@
         {
             "description": "Path within Git project to build; empty for root project directory.",
             "name": "CONTEXT_DIR",
-            "value": "iot-ose-businessrules-service",
+            "value": "iot-ocp-businessrules-service",
             "required": false
         },
         {

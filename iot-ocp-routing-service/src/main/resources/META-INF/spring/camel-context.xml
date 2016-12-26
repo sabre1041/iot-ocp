@@ -43,7 +43,7 @@
     <bindy type="Csv" classType="com.redhat.examples.iot.routingService.Measure" id="bindyDataFormat"/>
   </dataFormats>
   <route id="messagesFromSensor">
-  <from uri="mqtt:mqtt.temp.receiver?host=tcp://{{env:BROKER_AMQ_MQTT_SERVICE_HOST}}:{{env:BROKER_AMQ_MQTT_SERVICE_PORT}}&amp;subscribeTopicNames=iot-ose/#/#/#&amp;userName={{env:BROKER_AMQ_USERNAME}}&amp;password={{env:BROKER_AMQ_PASSWORD}}"/>
+  <from uri="mqtt:mqtt.temp.receiver?host=tcp://{{env:BROKER_AMQ_MQTT_SERVICE_HOST}}:{{env:BROKER_AMQ_MQTT_SERVICE_PORT}}&amp;subscribeTopicNames=iot-ocp/#/#/#&amp;userName={{env:BROKER_AMQ_USERNAME}}&amp;password={{env:BROKER_AMQ_PASSWORD}}"/>
     <bean ref="myHelper" method="enhanceMessage" beanType="com.redhat.examples.iot.routingService.MyHelper"/>
     <unmarshal ref="bindyDataFormat"/>
     <log message="Mesaure of type ${body.dataType} received with value ${body.payload}"/>

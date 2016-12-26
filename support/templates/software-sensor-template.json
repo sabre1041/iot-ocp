@@ -35,7 +35,7 @@
         {
             "description": "Git source URI for application",
             "name": "SOURCE_REPOSITORY_URL",
-            "value": "https://github.com/sabre1041/iot-ose.git",
+            "value": "https://github.com/sabre1041/iot-ocp.git",
             "required": true
         },
         {
@@ -47,7 +47,7 @@
         {
             "description": "Path within Git project to build; empty for root project directory.",
             "name": "CONTEXT_DIR",
-            "value": "iot-ose-software-sensor",
+            "value": "iot-ocp-software-sensor",
             "required": false
         },
         {

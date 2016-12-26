@@ -53,7 +53,7 @@ public class BusinessRulesBean {
 		cmds.add(getObjectsCommand);
 		BatchExecutionCommand myCommands = CommandFactory.newBatchExecution(cmds,
 				"DecisionTableKS");
-		ServiceResponse<ExecutionResults> response = client.executeCommandsWithResults("iot-ose-businessrules-service", myCommands);
+		ServiceResponse<ExecutionResults> response = client.executeCommandsWithResults("iot-ocp-businessrules-service", myCommands);
 				
 		List responseList = (List) response.getResult().getValue("objects");
 		
