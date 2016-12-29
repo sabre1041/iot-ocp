@@ -19,7 +19,7 @@
     {
       "name": "GIT_REPO",
       "required": true,
-      "value": "https://github.com/sabre1041/iot-ose.git",
+      "value": "https://github.com/sabre1041/iot-ocp.git",
       "description": "Git repository, required"
     },
     {
@@ -29,7 +29,7 @@
     },
     {
       "name": "GIT_CONTEXT_DIR",
-      "value": "iot-ose-routing-service",
+      "value": "iot-ocp-routing-service",
       "description": "Git context directory"
     },
     {
