@@ -403,7 +403,7 @@ function do_build_zeppelin() {
     echo
     echo "Deploying Visualization Tool..."
     echo
-    oc process -v=SOURCE_REPOSITORY_REF=${GIT_BRANCH} -l ${SOFTWARE_SENSOR_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/rhel-zeppelin.json | oc create -n ${IOT_OCP_PROJECT} -f-
+    oc process -v=SOURCE_REPOSITORY_REF=${GIT_BRANCH} -l ${ZEPPELIN_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/rhel-zeppelin.json | oc create -n ${IOT_OCP_PROJECT} -f-
 
     validate_build_deploy "rhel-zeppelin"
 
