@@ -1,0 +1,10 @@
+{
+    "kind": "ImageStream",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "centos"
+    },
+	"spec": {
+		"dockerImageRepository": "library/centos"
+	}
+}
