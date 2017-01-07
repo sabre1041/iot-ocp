@@ -22,6 +22,9 @@ KIE_LABEL="iotphase=kie"
 FIS_LABEL="iotphase=fis"
 SOFTWARE_SENSOR_LABEL="iotphase=software-sensor"
 ZEPPELIN_LABEL="iotphase=zeppelin"
+ZEPPELIN_RHEL_BASE_IMAGESTREAM="rhel7:7.2"
+ZEPPELIN_CENTOS_BASE_IMAGESTREAM="centos:7"
+ZEPPELIN_BASE_IMAGESTREAM=${ZEPPELIN_RHEL_BASE_IMAGESTREAM}
 
 trap exit_message EXIT
 
@@ -29,11 +32,23 @@ function exit_message() {
 
     if [ ! -z ${CURRENT_STAGE} ]; then
         echo
-        echo "Provisioning Failed. Execute \"$0 --restart-from $CURRENT_STAGE\" to Restart From The Failed Stage"
+        echo "Provisioning Failed. Execute \"$0 --restart-from $CURRENT_STAGE\" Along With Other Provided Parameters to Restart From The Failed Stage"
         echo
     fi
 
 }
+
+# Show script usage
+usage() {
+  echo "
+  Usage: $0 [options]
+  Options:
+  --zeppelin-base=<rhel7|centos>   : Base used to build Zeppelin Image (Default: rhel7)
+  --restart-from <phase>           : Phase to restart execution
+  -h|--help                        : Show script usage
+   "
+}
+
 
 function check_restart() {
 
@@ -229,6 +244,7 @@ function do_ocp_components() {
     fi
 
     CURRENT_STAGE="configure-ocp"
+    ZEPPELIN_IMAGE=$(echo ${ZEPPELIN_BASE_IMAGESTREAM} | cut -d: -f1)
     
     echo "Setting up OpenShift IoT Example Project"
 
@@ -242,7 +258,7 @@ function do_ocp_components() {
     echo
     oc $ACTION -n ${IOT_OCP_PROJECT} -f ${SCRIPT_BASE_DIR}/support/templates/jboss-image-streams.json
     oc $ACTION -n ${IOT_OCP_PROJECT} -f ${SCRIPT_BASE_DIR}/support/templates/fis-image-streams.json
-    oc $ACTION -n ${IOT_OCP_PROJECT} -f ${SCRIPT_BASE_DIR}/support/templates/rhel-is.json
+    oc $ACTION -n ${IOT_OCP_PROJECT} -f ${SCRIPT_BASE_DIR}/support/templates/${ZEPPELIN_IMAGE}-is.json
 
     echo
     echo "Pausing 10 Seconds..."
@@ -255,7 +271,8 @@ function do_ocp_components() {
     oc import-image -n ${IOT_OCP_PROJECT} jboss-decisionserver63-openshift --all=true >/dev/null 2>&1
     oc import-image -n ${IOT_OCP_PROJECT} jboss-amq-62 --all=true >/dev/null 2>&1
     oc import-image -n ${IOT_OCP_PROJECT} fis-karaf-openshift --all=true >/dev/null 2>&1
-    oc import-image -n ${IOT_OCP_PROJECT} rhel7 --all=true >/dev/null 2>&1
+    oc import-image -n ${IOT_OCP_PROJECT} ${ZEPPELIN_IMAGE} --all=true >/dev/null 2>&1
+
     do_postgresql
 
 }
@@ -403,7 +420,7 @@ function do_build_zeppelin() {
     echo
     echo "Deploying Visualization Tool..."
     echo
-    oc process -v=SOURCE_REPOSITORY_REF=${GIT_BRANCH} -l ${ZEPPELIN_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/rhel-zeppelin.json | oc create -n ${IOT_OCP_PROJECT} -f-
+    oc process -v=SOURCE_REPOSITORY_REF=${GIT_BRANCH},BASE_IMAGESTREAMTAG=${ZEPPELIN_BASE_IMAGESTREAM} -l ${ZEPPELIN_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/rhel-zeppelin.json | oc create -n ${IOT_OCP_PROJECT} -f-
 
     validate_build_deploy "rhel-zeppelin"
 
@@ -437,72 +454,91 @@ function do_configure_zeppelin() {
 # Prerequisites
 oc whoami >/dev/null 2>&1 || { echo "Cannot validate connectivity to OpenShift. Ensure oc client tool installed and logged in" ; exit 1; }
 
-if [ ! -z $1 ]; then
-    
-    if [ "$1" == "--restart-from" ]; then
-        if [ -z $2 ]; then
-          echo "Value Must Be Specified When Restarting From Step..."
-          exit 1
-        fi
-        
-        case $2 in
-            
-            "configure-ocp")
-              echo "Restarting at Step \"configure-ocp\""
-              do_ocp_components "restart"
-            ;;
-            "postgresql")
-              echo "Restarting at Step \"postgresql\""
-              do_postgresql "restart"
-            ;;
-            "amq")
-              echo "Restarting at Step \"amq\""
-              do_amq "restart"
-            ;;
-            "kie")
-              echo "Restarting at Step \"kie\""
-              do_kie "restart"
-            ;;
-            "fis")
-              echo "Restarting at Step \"fis\""
-              do_fis "restart"
-            ;;
-            "software-sensor")
-              echo "Restarting at Step \"software-sensor\""
-              do_software_sensor "restart"
-            ;;
-            "build-zeppelin")
-              echo "Restarting at Step \"build-zeppelin\""
-              do_build_zeppelin "restart"
-            ;;  
-            "configure-zeppelin")
-              echo "Restarting at Step \"configure-zeppelin\""
-              do_configure_zeppelin "restart";
-              ;;
-              *)
-              echo "
-               Invalid Restart Option: $2
-              
-               Restart Options
-                 * configure-ocp
-                 * postgresql
-                 * amq
-                 * kie
-                 * fis
-                 * software-sensor
-                 * build-zeppelin
-                 * configure-zeppelin
-              "
-              exit 1
-        esac
-                
+RESTART_OPTION=
+
+# Process Input
+for i in "$@"
+do
+  case $i in
+    --zeppelin-base=*)
+      USER_ZEPPELIN_BASE="${i#*=}"
+      shift;;
+    --restart-from=*)
+      RESTART_OPTION="${i#*=}"
+      shift;;
+    -h|--help|*)
+      usage
+      exit
+  esac
+done
+
+# Validate Zeppelin Base
+if [ ! -z ${USER_ZEPPELIN_BASE} ]; then
+
+    if [ "${USER_ZEPPELIN_BASE}" == "rhel" ]; then
+        ZEPPELIN_BASE_IMAGESTREAM=${ZEPPELIN_RHEL_BASE_IMAGESTREAM}
+    elif [ "${USER_ZEPPELIN_BASE}" == "centos" ]; then
+        ZEPPELIN_BASE_IMAGESTREAM=${ZEPPELIN_CENTOS_BASE_IMAGESTREAM}
     else
-      echo "Invalid parameter specified."
-      exit  
+        echo "Invalid Zeppelin Base. Either rhel or centos must be provided"
+        exit  
     fi
+fi
+
+
+if [ ! -z ${RESTART_OPTION} ]; then
+
+    case $RESTART_OPTION in
+        "configure-ocp")
+          echo "Restarting at Step \"configure-ocp\""
+          do_ocp_components "restart"
+        ;;
+        "postgresql")
+          echo "Restarting at Step \"postgresql\""
+          do_postgresql "restart"
+        ;;
+        "amq")
+          echo "Restarting at Step \"amq\""
+          do_amq "restart"
+        ;;
+        "kie")
+          echo "Restarting at Step \"kie\""
+          do_kie "restart"
+        ;;
+        "fis")
+          echo "Restarting at Step \"fis\""
+          do_fis "restart"
+        ;;
+        "software-sensor")
+          echo "Restarting at Step \"software-sensor\""
+          do_software_sensor "restart"
+        ;;
+        "build-zeppelin")
+          echo "Restarting at Step \"build-zeppelin\""
+          do_build_zeppelin "restart"
+        ;;  
+        "configure-zeppelin")
+          echo "Restarting at Step \"configure-zeppelin\""
+          do_configure_zeppelin "restart";
+          ;;
+          *)
+          echo "
+           Invalid Restart Option: $2
+          
+           Restart Options
+             * configure-ocp
+             * postgresql
+             * amq
+             * kie
+             * fis
+             * software-sensor
+             * build-zeppelin
+             * configure-zeppelin
+          "
+          exit 1
+    esac
 
 else
-
     # Normal Execution
     do_ocp_components
 fi
