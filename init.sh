@@ -32,7 +32,7 @@ function exit_message() {
 
     if [ ! -z ${CURRENT_STAGE} ]; then
         echo
-        echo "Provisioning Failed. Execute \"$0 --restart-from $CURRENT_STAGE\" Along With Other Provided Parameters to Restart From The Failed Stage"
+        echo "Provisioning Failed. Execute \"$0 --restart-from=$CURRENT_STAGE\" Along With Other Provided Parameters to Restart From The Failed Stage"
         echo
     fi
 
