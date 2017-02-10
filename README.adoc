@@ -27,7 +27,7 @@ The application is deployed as a set of microservices inside containers on OpenS
 
 *Step 1:* Login to your OpenShift environment using the command-line tools
 
-_Note: If you don't have an environment handy, the https://developers.redhat.com/products/cdk/overview/[Red Hat Container Development Kit] provides a fully-functional preconfigured OpenShift environment, including Red Hat Enterprise Linux (RHEL) and JBoss, delivered as a Virtual Machine image_
+_Note: If you don't have an environment handy, the https://developers.redhat.com/products/cdk/overview/[Red Hat Container Development Kit] provides a fully-functional preconfigured OpenShift environment, including Red Hat Enterprise Linux (RHEL) and JBoss, delivered as a Virtual Machine image. The VM should be enabled with minimum of 4 CPU and 6144MB memory (i.e. Vagrant file for CDK should be updated with this VM configuration)_
 
 *Step 2:* Download the iot-ocp project in the OpenShift instance:
 
