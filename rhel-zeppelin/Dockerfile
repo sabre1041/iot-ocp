@@ -23,7 +23,7 @@ RUN yum clean all && \
     curl -fsSL http://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz | tar xzf - -C /usr/share \
       && mv /usr/share/apache-maven-$MAVEN_VERSION /usr/share/maven \
       && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn && \
-    curl -fSL $(curl -s http://www.apache.org/dyn/closer.cgi/zeppelin/zeppelin-$ZEPPELIN_VERSION/zeppelin-$ZEPPELIN_VERSION-bin-netinst.tgz?as_json=1 | grep preferred | cut -f 4 -d \" -)/zeppelin/zeppelin-$ZEPPELIN_VERSION/zeppelin-${ZEPPELIN_VERSION}-bin-netinst.tgz | tar xzf - --strip 1 -C $ZEPPELIN_SERVER_HOME/ && \
+    curl -fSL http://archive.apache.org/dist/zeppelin/zeppelin-$ZEPPELIN_VERSION/zeppelin-$ZEPPELIN_VERSION-bin-netinst.tgz | tar xzf - --strip 1 -C $ZEPPELIN_SERVER_HOME/ && \
     chown -R 1001:0 $HOME/server $HOME/bin $HOME/storage && \
     chmod -R "g+rwX" $HOME/server $HOME/bin $HOME/storage
     
