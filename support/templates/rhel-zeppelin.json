@@ -26,7 +26,7 @@
         {
             "description": "Git source URI for application",
             "name": "SOURCE_REPOSITORY_URL",
-            "value": "https://github.com/sabre1041/iot-ocp.git",
+            "value": "https://github.com/gpe-mw-training/iot-ocp.git",
             "required": true
         },
         {
