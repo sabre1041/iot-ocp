@@ -25,6 +25,8 @@ ZEPPELIN_LABEL="iotphase=zeppelin"
 ZEPPELIN_RHEL_BASE_IMAGESTREAM="rhel7:7.2"
 ZEPPELIN_CENTOS_BASE_IMAGESTREAM="centos:7"
 ZEPPELIN_BASE_IMAGESTREAM=${ZEPPELIN_RHEL_BASE_IMAGESTREAM}
+PROJECT_SUFFIX=
+ADMIN_ADDL_USERNAME=
 
 trap exit_message EXIT
 
@@ -253,6 +255,14 @@ function do_ocp_components() {
     echo
     oc new-project ${IOT_OCP_PROJECT} --description="Showcases an Intelligent Internet-of-Things (IoT) Gateway on Red Hat’s OpenShift Container Platform" --display-name="Internet of Things (IoT) OpenShift Demo Project" >/dev/null 2>&1
 
+    if [ ! -z ${ADMIN_ADDL_USERNAME} ]; then
+        echo
+        echo "Adding admin role to ${ADMIN_ADDL_USERNAME}..."
+        echo
+
+        oc policy add-role-to-user admin ${ADMIN_ADDL_USERNAME} -n ${IOT_OCP_PROJECT}
+    fi
+
     echo
     echo "Creating ImageStreams..."
     echo
@@ -465,6 +475,12 @@ do
       shift;;
     --restart-from=*)
       RESTART_OPTION="${i#*=}"
+      shift;;
+    --project-suffix=*)
+      IOT_OCP_PROJECT="${IOT_OCP_PROJECT}-${i#*=}"
+      shift;;
+    --user=*)
+      ADMIN_ADDL_USERNAME="${i#*=}"
       shift;;
     -h|--help|*)
       usage
