@@ -67,26 +67,6 @@
                 "strategy": {
                     "type": "Recreate"
                 },
-                "triggers": [
-                    {
-                        "type": "ImageChange",
-                        "imageChangeParams": {
-                            "automatic": true,
-                            "containerNames": [
-                                "postgresql"
-                            ],
-                            "from": {
-                                "kind": "ImageStreamTag",
-                                "name": "postgresql:latest",
-                                "namespace": "${NAMESPACE}"
-                            },
-                            "lastTriggeredImage": ""
-                        }
-                    },
-                    {
-                        "type": "ConfigChange"
-                    }
-                ],
                 "replicas": 1,
                 "selector": {
                     "name": "${DATABASE_SERVICE_NAME}"
@@ -102,7 +82,7 @@
                         "containers": [
                             {
                                 "name": "postgresql",
-                                "image": " ",
+                                "image": "registry.access.redhat.com/rhscl/postgresql-94-rhel7:latest",
                                 "ports": [
                                     {
                                         "containerPort": 5432,

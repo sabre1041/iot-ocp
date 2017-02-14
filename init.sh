@@ -1,7 +1,6 @@
 #!/bin/bash
 
 SCRIPT_BASE_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-IOT_OCP_PROJECT="iot-ocp"
 MQ_USER="iotuser"
 MQ_PASSWORD="iotuser"
 KIE_USER="kieuser"
@@ -249,9 +248,12 @@ function do_ocp_components() {
     echo "Setting up OpenShift IoT Example Project"
 
     echo
-    echo "Creating Project: ${IOT_OCP_PROJECT}..."
+    echo "Using Project: ${IOT_OCP_PROJECT}..."
     echo
-    oc new-project ${IOT_OCP_PROJECT} --description="Showcases an Intelligent Internet-of-Things (IoT) Gateway on Red Hat’s OpenShift Container Platform" --display-name="Internet of Things (IoT) OpenShift Demo Project" >/dev/null 2>&1
+
+    # JA Bride:  Not needed for GPTE OCP environment because student would have already registered for an OCP project via GPTE CloudForms
+    # oc new-project ${IOT_OCP_PROJECT} --description="Showcases an Intelligent Internet-of-Things (IoT) Gateway on Red Hat’s OpenShift Container Platform" --display-name="Internet of Things (IoT) OpenShift Demo Project" >/dev/null 2>&1
+    oc project ${IOT_OCP_PROJECT}
 
     echo
     echo "Creating ImageStreams..."
@@ -466,11 +468,20 @@ do
     --restart-from=*)
       RESTART_OPTION="${i#*=}"
       shift;;
+    --ocp-project=*)
+      IOT_OCP_PROJECT="${i#*=}"
+      shift;;
     -h|--help|*)
       usage
       exit
   esac
 done
+
+# Validate OCP project
+if [ x${IOT_OCP_PROJECT} == "x" ]; then
+    echo "Must invoke this script using an argument of:  --ocp-project=<my-iot-ocp-project-name>"
+    exit 1;
+fi
 
 # Validate Zeppelin Base
 if [ ! -z ${USER_ZEPPELIN_BASE} ]; then
