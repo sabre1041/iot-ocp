@@ -32,12 +32,15 @@ trap exit_message EXIT
 
 function exit_message() {
 
+    exit_code=$?
+
     if [ ! -z ${CURRENT_STAGE} ]; then
         echo
         echo "Provisioning Failed. Execute \"$0 --restart-from=$CURRENT_STAGE\" Along With Other Provided Parameters to Restart From The Failed Stage"
         echo
     fi
 
+    exit $exit_code
 }
 
 # Show script usage
