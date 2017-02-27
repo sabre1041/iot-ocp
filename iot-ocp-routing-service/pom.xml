@@ -1,266 +1,268 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.redhat.examples.iot</groupId>
-  <artifactId>iot-ocp-routing-service</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <packaging>bundle</packaging>
-  
-  <properties>
-    <!-- Explicitly declaring the source encoding eliminates the following message: -->
-    <!-- [WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent! -->
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <!-- maven-compiler-plugin -->
-    <maven.compiler.target>1.7</maven.compiler.target>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.plugin.version>3.2</maven.compiler.plugin.version>
-	<maven.bundle.plugin.version>2.3.7</maven.bundle.plugin.version>
-    <maven.bundle.plugin.version>2.5.3</maven.bundle.plugin.version>
-    <maven.resources.plugin.version>2.7</maven.resources.plugin.version>
-		<spring.features.version>3.0.4</spring.features.version>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.redhat.examples.iot</groupId>
+	<artifactId>iot-ocp-routing-service</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>bundle</packaging>
 
-    
-    <camel.version>2.15.1.redhat-621084</camel.version>
-    <slf4j.version>1.7.10</slf4j.version>
-		<fabric8.version>2.2.0.redhat-079</fabric8.version>
-		<fuse.version>6.2.1.redhat-084</fuse.version>
-		<activemq-version>5.11.0.redhat-621084</activemq-version>
-		<karaf.version>2.4.0.redhat-621084</karaf.version>
-		<karaf.plugin.version>4.0.2.redhat-621079</karaf.plugin.version>
-		<brms.version>6.4.0.Final-redhat-3</brms.version>
+	<properties>
+		<!-- Explicitly declaring the source encoding eliminates the following 
+			message: -->
+		<!-- [WARNING] Using platform encoding (UTF-8 actually) to copy filtered 
+			resources, i.e. build is platform dependent! -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- maven-compiler-plugin -->
+		<maven.compiler.target>1.7</maven.compiler.target>
+		<maven.compiler.source>1.7</maven.compiler.source>
+		<maven.compiler.plugin.version>3.3</maven.compiler.plugin.version>
+		<maven.bundle.plugin.version>2.3.7</maven.bundle.plugin.version>
+		<maven.resources.plugin.version>2.7</maven.resources.plugin.version>
+		<spring.features.version>4.0.8</spring.features.version>
+
+
+		<camel.version>2.15.1.redhat-621084</camel.version>
+		<slf4j.version>1.7.10</slf4j.version>
+		<fabric8.version>2.2.170.redhat-000010</fabric8.version>
+		<activemq-version>5.11.0.redhat-630224</activemq-version>
+		<karaf.plugin.version>4.0.8.redhat-000026</karaf.plugin.version>
+		<brms.version>6.5.0.Final-redhat-5</brms.version>
 		<postgresql.version>9.4-1200-jdbc41</postgresql.version>
 		<pax.jdbc.version>0.7.0</pax.jdbc.version>
 		<commons.dbcp.version>1.4_3</commons.dbcp.version>
-  </properties>
-  
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-core</artifactId>
-            <version>${camel.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-spring</artifactId>
-            <version>${camel.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-test-spring</artifactId>
-            <version>${camel.version}</version>
-           	<scope>test</scope>
-        </dependency>
+	</properties>
 
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-test</artifactId>
-            <version>${camel.version}</version>
-            <scope>test</scope>
-        </dependency>
+	<dependencyManagement>
+		<dependencies>
+			<!-- import fabric8 platform bom first -->
+			<dependency>
+				<groupId>io.fabric8</groupId>
+				<artifactId>fabric8-project-bom-fuse-karaf</artifactId>
+				<version>${fabric8.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-spring</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-test-spring</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 
-        
-        	<dependency>
-	      <groupId>org.apache.camel</groupId>
-	      <artifactId>camel-bindy</artifactId>
-	       <version>${camel.version}</version>
-	    </dependency>
-	    
-        <dependency>
-		    <groupId>org.apache.camel</groupId>
-		    <artifactId>camel-mqtt</artifactId>
-		    <version>${camel.version}</version>
+
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-bindy</artifactId>
 		</dependency>
-		
-        <dependency>
-		    <groupId>org.apache.camel</groupId>
-		    <artifactId>camel-jaxb</artifactId>
-		    <version>${camel.version}</version>
+
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-mqtt</artifactId>
 		</dependency>
-		
-        <dependency>
-		    <groupId>org.apache.camel</groupId>
-		    <artifactId>camel-jdbc</artifactId>
-		    <version>${camel.version}</version>
+
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-jaxb</artifactId>
 		</dependency>
-		
-        <dependency>
-		    <groupId>org.apache.servicemix.bundles</groupId>
-		    <artifactId>org.apache.servicemix.bundles.commons-dbcp</artifactId>
-		    <version>${commons.dbcp.version}</version>
+
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-jdbc</artifactId>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>org.apache.servicemix.bundles</groupId>
+			<artifactId>org.apache.servicemix.bundles.commons-dbcp</artifactId>
+			<version>${commons.dbcp.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>${postgresql.version}</version>
 		</dependency>
-		
-     <dependency>
-      <groupId>org.kie.server</groupId>
-      <artifactId>kie-server-client</artifactId>
-      <version>${brms.version}</version>
-    </dependency>
 
-		
-    <!-- Karaf microcontainer dependencies -->
-    <dependency>
-      <!-- scope is compile so all features (there is only one) are installed into startup.properties,
-and the feature repo itself is not added in etc/org.apache.karaf.features.cfg file -->
-      <groupId>org.jboss.fuse</groupId>
-      <artifactId>fuse-karaf-framework</artifactId>
-      <version>${fuse.version}</version>
-      <type>kar</type>
-      <!-- no need to download kar dependencies -->
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.karaf.assemblies.features</groupId>
-      <artifactId>standard</artifactId>
-      <version>${karaf.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.karaf.assemblies.features</groupId>
-      <artifactId>enterprise</artifactId>
-      <version>${karaf.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.camel.karaf</groupId>
-      <artifactId>apache-camel</artifactId>
-      <version>${camel.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-karaf</artifactId>
-      <version>${activemq-version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-    </dependency>
-    <dependency>
-      <groupId>org.ops4j.pax.jdbc</groupId>
-      <artifactId>pax-jdbc-features</artifactId>
-      <version>${pax.jdbc.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.apache.karaf.features</groupId>
-      <artifactId>spring</artifactId>
-      <version>${spring.features.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.drools</groupId>
-      <artifactId>drools-karaf-features</artifactId>
-      <type>xml</type>
-      <version>${brms.version}</version>
-      <classifier>features</classifier>
-    </dependency>
-    </dependencies>
-    
-    <build>
-        <defaultGoal>install</defaultGoal>
-
-        <plugins>
-
-          <plugin>
-            <groupId>org.apache.karaf.tooling</groupId>
-            <artifactId>karaf-maven-plugin</artifactId>
-            <version>${karaf.plugin.version}</version>
-            <extensions>true</extensions>
-            <executions>
-              <execution>
-                <id>karaf-assembly</id>
-                <goals>
-                  <goal>assembly</goal>
-                </goals>
-                <phase>install</phase>
-              </execution>
-              <execution>
-                <id>karaf-archive</id>
-                <goals>
-                  <goal>archive</goal>
-                </goals>
-                <phase>install</phase>
-              </execution>
-            </executions>
-            <configuration>
-              <karafVersion>v24</karafVersion>
-              <javase>1.8</javase>
-              <useReferenceUrls>true</useReferenceUrls>
-              <!-- do not include build output directory -->
-              <includeBuildOutputDirectory>false</includeBuildOutputDirectory>
-              <startupFeatures>
-                <feature>karaf-framework</feature>
-                <feature>shell</feature>
-                <feature>jaas</feature>
-                <feature>spring</feature>
-                <!--feature>activemq-client</feature-->
-                <feature>activemq-camel</feature>
-                <feature>camel-spring</feature>
-                <feature>camel-bindy</feature>
-                <feature>camel-mqtt</feature>
-                <feature>camel-jdbc</feature>
-                <feature>kie-server-client</feature>
-                <feature>camel-jaxb</feature>
-                <feature>pax-jdbc-spec</feature>
-              </startupFeatures>
-              <startupBundles>
-                <!--  this needs to be here for spring-dm to resolve properly!!-->
-                <bundle>mvn:org.apache.karaf.bundle/org.apache.karaf.bundle.core/3.0.4</bundle>
-                <bundle>mvn:io.fabric8.mq/mq-client/2.2.0.redhat-079</bundle>
-                <bundle>mvn:io.fabric8/fabric8-utils/2.2.0.redhat-079</bundle>
-                <bundle>mvn:org.postgresql/postgresql/${postgresql.version}</bundle>
-                <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-dbcp/${commons.dbcp.version}</bundle>
-                <bundle>mvn:${project.groupId}/${project.artifactId}/${project.version}</bundle>
-              </startupBundles>
-            </configuration>
-          </plugin>
+		<dependency>
+			<groupId>org.kie.server</groupId>
+			<artifactId>kie-server-client</artifactId>
+			<version>${brms.version}</version>
+		</dependency>
 
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.plugin.version}</version>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                </configuration>
-            </plugin>
+		<!-- Karaf microcontainer dependencies -->
+		<dependency>
+			<!-- scope is compile so all features (there is only one) are installed 
+				into startup.properties, and the feature repo itself is not added in etc/org.apache.karaf.features.cfg 
+				file -->
+			<groupId>org.jboss.fuse</groupId>
+			<artifactId>fuse-karaf-framework</artifactId>
+			<type>kar</type>
+			<!-- no need to download kar dependencies -->
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.karaf.assemblies.features</groupId>
+			<artifactId>standard</artifactId>
+			<classifier>features</classifier>
+			<type>xml</type>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.karaf.assemblies.features</groupId>
+			<artifactId>enterprise</artifactId>
+			<classifier>features</classifier>
+			<type>xml</type>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel.karaf</groupId>
+			<artifactId>apache-camel</artifactId>
+			<classifier>features</classifier>
+			<type>xml</type>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-karaf</artifactId> 
+			<version>${activemq-version}</version>
+			<classifier>features</classifier> 
+			<type>xml</type>
+		</dependency>
+		<dependency>
+			<groupId>org.ops4j.pax.jdbc</groupId>
+			<artifactId>pax-jdbc-features</artifactId>
+			<version>${pax.jdbc.version}</version>
+			<classifier>features</classifier>
+			<type>xml</type>
+		</dependency>
 
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>${maven.bundle.plugin.version}</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Import-Package>*</Import-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
+		<dependency>
+			<groupId>org.apache.karaf.features</groupId>
+			<artifactId>spring</artifactId>
+			<version>${spring.features.version}</version>
+			<classifier>features</classifier>
+			<type>xml</type>
+		</dependency>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>${maven.resources.plugin.version}</version>
-            </plugin>
+		<dependency>
+			<groupId>org.drools</groupId>
+			<artifactId>drools-karaf-features</artifactId>
+			<type>xml</type>
+			<version>${brms.version}</version>
+			<classifier>features</classifier>
+		</dependency>
+	</dependencies>
 
-        </plugins>
-    </build>
+	<build>
+		<defaultGoal>install</defaultGoal>
+
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.karaf.tooling</groupId>
+				<artifactId>karaf-maven-plugin</artifactId>
+				<version>${karaf.plugin.version}</version>
+				<extensions>true</extensions>
+				<executions>
+					<execution>
+						<id>karaf-assembly</id>
+						<goals>
+							<goal>assembly</goal>
+						</goals>
+						<phase>install</phase>
+					</execution>
+					<execution>
+						<id>karaf-archive</id>
+						<goals>
+							<goal>archive</goal>
+						</goals>
+						<phase>install</phase>
+					</execution>
+				</executions>
+				<configuration>
+					<karafVersion>v24</karafVersion>
+					<javase>1.8</javase>
+					<useReferenceUrls>true</useReferenceUrls>
+					<!-- do not include build output directory -->
+					<includeBuildOutputDirectory>false</includeBuildOutputDirectory>
+					<startupFeatures>
+						<feature>karaf-framework</feature>
+						<feature>shell</feature>
+						<feature>jaas</feature>
+						<feature>spring</feature>
+						<!--feature>activemq-client</feature -->
+						<feature>activemq-camel</feature>
+						<feature>camel-spring</feature>
+						<feature>camel-bindy</feature>
+						<feature>camel-mqtt</feature>
+						<feature>camel-jdbc</feature>
+						<feature>kie-server-client</feature>
+						<feature>camel-jaxb</feature>
+						<feature>pax-jdbc-spec</feature>
+					</startupFeatures>
+					<startupBundles>
+						<!-- this needs to be here for spring-dm to resolve properly!! -->
+						<bundle>mvn:org.apache.karaf.bundle/org.apache.karaf.bundle.core/3.0.4</bundle>
+						<bundle>mvn:io.fabric8.mq/mq-client/2.2.0.redhat-079</bundle>
+						<bundle>mvn:io.fabric8/fabric8-utils/2.2.0.redhat-079</bundle>
+						<bundle>mvn:org.postgresql/postgresql/${postgresql.version}</bundle>
+						<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-dbcp/${commons.dbcp.version}</bundle>
+						<bundle>mvn:${project.groupId}/${project.artifactId}/${project.version}</bundle>
+					</startupBundles>
+				</configuration>
+			</plugin>
+
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven.compiler.plugin.version}</version>
+				<configuration>
+					<source>${maven.compiler.source}</source>
+					<target>${maven.compiler.target}</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>${maven.bundle.plugin.version}</version>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Import-Package>*</Import-Package>
+					</instructions>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>${maven.resources.plugin.version}</version>
+			</plugin>
+
+		</plugins>
+	</build>
 
 
 </project>

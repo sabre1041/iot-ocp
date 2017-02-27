@@ -11,6 +11,7 @@ POSTGRESQL_APP_NAME="postgresql"
 POSTGRESQL_USERNAME="postgresiot"
 POSTGRESQL_PASSWORD="postgresiot"
 POSTGRESQL_DATABASE="iot"
+AMQ_SSL_PASSWORD="iotocp"
 BUILD_CHECK_INTERVAL=5
 BUILD_CHECK_TIMES=60
 DEPLOYMENT_CHECK_INTERVAL=10
@@ -28,7 +29,7 @@ ZEPPELIN_BASE_IMAGESTREAM=${ZEPPELIN_RHEL_BASE_IMAGESTREAM}
 PROJECT_SUFFIX=
 ADMIN_ADDL_USERNAME=
 SKIP_STEPS=
-STAGES=(configure-ocp postgresql kie amq kie fis software-sensor build-zeppelin configure-zeppelin)
+STAGES=(configure-ocp postgresql amq kie fis software-sensor build-zeppelin configure-zeppelin)
 
 trap exit_message EXIT
 
@@ -51,7 +52,10 @@ usage() {
   Usage: $0 [options]
   Options:
   --zeppelin-base=<rhel7|centos>   : Base used to build Zeppelin Image (Default: rhel7)
-  --restart-from <phase>           : Phase to restart execution
+  --restart-from=<phase>           : Phase to restart execution
+  --project-suffix=<suffix>        : Name of the suffix to apply to a project
+  --skip-steps=<steps>             : Comma separated list of steps to skip
+  --user=<user>                    : User to add as an Administrator to the project
   -h|--help                        : Show script usage
    "
 }
@@ -289,6 +293,7 @@ function do_configure_ocp() {
     echo
     oc $ACTION -n ${IOT_OCP_PROJECT} -f ${SCRIPT_BASE_DIR}/support/templates/jboss-image-streams.json
     oc $ACTION -n ${IOT_OCP_PROJECT} -f ${SCRIPT_BASE_DIR}/support/templates/fis-image-streams.json
+    oc $ACTION -n ${IOT_OCP_PROJECT} -f ${SCRIPT_BASE_DIR}/support/templates/openjdk18-openshift-is.json
     oc $ACTION -n ${IOT_OCP_PROJECT} -f ${SCRIPT_BASE_DIR}/support/templates/${ZEPPELIN_IMAGE}-is.json
 
     echo
@@ -302,6 +307,7 @@ function do_configure_ocp() {
     oc import-image -n ${IOT_OCP_PROJECT} jboss-decisionserver63-openshift --all=true >/dev/null 2>&1
     oc import-image -n ${IOT_OCP_PROJECT} jboss-amq-62 --all=true >/dev/null 2>&1
     oc import-image -n ${IOT_OCP_PROJECT} fis-karaf-openshift --all=true >/dev/null 2>&1
+    oc import-image -n ${IOT_OCP_PROJECT} openjdk18-openshift --all=true >/dev/null 2>&1
     oc import-image -n ${IOT_OCP_PROJECT} ${ZEPPELIN_IMAGE} --all=true >/dev/null 2>&1
 
 }
@@ -344,17 +350,30 @@ function do_postgresql() {
 function do_amq() {
     
     CURRENT_STAGE="amq"
-    
+
     if check_restart $1
     then
         oc delete all -l ${AMQ_LABEL}
+        oc delete sa amq-service-account
+        oc delete secret amq-app-secret
         sleep 15
     fi
 
     echo
+    echo "Creating AMQ Service Account..."
+    echo
+    oc create serviceaccount amq-service-account
+    oc policy add-role-to-user edit system:serviceaccount:${IOT_OCP_PROJECT}:amq-service-account
+
+    echo
+    echo "Creating AMQ Secret..."
+    echo
+    oc secrets new amq-app-secret ${SCRIPT_BASE_DIR}/support/amq-ssl
+
+    echo
     echo "Deploying AMQ..."
     echo
-    oc process -v=MQ_USERNAME=${MQ_USER} -v=MQ_PASSWORD=${MQ_PASSWORD} -v=IMAGE_STREAM_NAMESPACE=${IOT_OCP_PROJECT} -l ${AMQ_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/amq62-basic.json | oc create -n ${IOT_OCP_PROJECT} -f-
+    oc process -v=MQ_USERNAME=${MQ_USER} -v=MQ_PASSWORD=${MQ_PASSWORD} -v=IMAGE_STREAM_NAMESPACE=${IOT_OCP_PROJECT} -v=AMQ_TRUSTSTORE_PASSWORD=${AMQ_SSL_PASSWORD} -v=AMQ_KEYSTORE_PASSWORD=${AMQ_SSL_PASSWORD} -l ${AMQ_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/amq62-ssl.json | oc create -n ${IOT_OCP_PROJECT} -f-
 
     echo
     echo "Waiting for AMQ to deploy..."
@@ -362,9 +381,9 @@ function do_amq() {
     wait_for_application_deployment "broker-amq"
 
     echo
-    echo "Exposing MQTT Route..."
+    echo "Creating Secure AMQ Route..."
     echo
-    oc expose svc -n ${IOT_OCP_PROJECT} -l ${AMQ_LABEL} broker-amq-mqtt
+    oc create route passthrough -n ${IOT_OCP_PROJECT} broker-amq-mqtt --service=broker-amq-tcp-ssl --port=61617
 
 }
 
@@ -419,7 +438,7 @@ function do_software_sensor() {
     echo
     echo "Deploying Software Sensor Application..."
     echo
-    oc process -v=MQTT_USERNAME="${MQ_USER}" -v=MQTT_PASSWORD="${MQ_PASSWORD}" -v=SOURCE_REPOSITORY_REF=${GIT_BRANCH} -l ${SOFTWARE_SENSOR_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/software-sensor-template.json | oc create -n ${IOT_OCP_PROJECT} -f-
+    oc process -v=MQTT_USERNAME="${MQ_USER}" -v=MQTT_PASSWORD="${MQ_PASSWORD}" -v=SOURCE_REPOSITORY_REF=${GIT_BRANCH} -v=IMAGE_STREAM_NAMESPACE=${IOT_OCP_PROJECT} -l ${SOFTWARE_SENSOR_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/software-sensor-template.json | oc create -n ${IOT_OCP_PROJECT} -f-
 
     validate_build_deploy "software-sensor"
 
@@ -551,7 +570,14 @@ do
     # Execute Step
     echo "Executing Step: ${step}"
     echo
-    eval do_${step//-/_}
+    
+    if [ $step == ${RESTART_OPTION} ]; then
+        RESTART_SWITCH="restart"
+    else
+        RESTART_SWITCH=""
+    fi
+    
+    eval do_${step//-/_} ${RESTART_SWITCH}
 
 done
 
