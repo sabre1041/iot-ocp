@@ -571,7 +571,7 @@ do
     echo "Executing Step: ${step}"
     echo
     
-    if [ $step == ${RESTART_OPTION} ]; then
+    if [ "$step" == "${RESTART_OPTION}" ]; then
         RESTART_SWITCH="restart"
     else
         RESTART_SWITCH=""

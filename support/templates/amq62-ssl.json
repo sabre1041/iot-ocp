@@ -27,7 +27,7 @@
             "displayName": "A-MQ Protocols",
             "description": "Protocols to configure, separated by commas. Allowed values are: `openwire`, `amqp`, `stomp` and `mqtt`. SSL variants of these protocols will be configured automaticaly.",
             "name": "MQ_PROTOCOL",
-            "value": "openwire",
+            "value": "openwire,mqtt",
             "required": false
         },
         {
