@@ -11,6 +11,7 @@ POSTGRESQL_APP_NAME="postgresql"
 POSTGRESQL_USERNAME="postgresiot"
 POSTGRESQL_PASSWORD="postgresiot"
 POSTGRESQL_DATABASE="iot"
+AMQ_SSL_PASSWORD="iotocp"
 BUILD_CHECK_INTERVAL=5
 BUILD_CHECK_TIMES=60
 DEPLOYMENT_CHECK_INTERVAL=10
@@ -27,6 +28,8 @@ ZEPPELIN_CENTOS_BASE_IMAGESTREAM="centos:7"
 ZEPPELIN_BASE_IMAGESTREAM=${ZEPPELIN_RHEL_BASE_IMAGESTREAM}
 PROJECT_SUFFIX=
 ADMIN_ADDL_USERNAME=
+SKIP_STEPS=
+STAGES=(configure-ocp postgresql amq kie fis software-sensor build-zeppelin configure-zeppelin)
 
 trap exit_message EXIT
 
@@ -49,11 +52,30 @@ usage() {
   Usage: $0 [options]
   Options:
   --zeppelin-base=<rhel7|centos>   : Base used to build Zeppelin Image (Default: rhel7)
-  --restart-from <phase>           : Phase to restart execution
+  --restart-from=<phase>           : Phase to restart execution
+  --project-suffix=<suffix>        : Name of the suffix to apply to a project
+  --skip-steps=<steps>             : Comma separated list of steps to skip
+  --user=<user>                    : User to add as an Administrator to the project
   -h|--help                        : Show script usage
    "
 }
 
+function findIndex() {
+    QUERY=$1
+    START=-1
+
+    if [ ! -z ${QUERY} ]; then
+
+        for i in "${!STAGES[@]}"; do
+            if [[ "${STAGES[$i]}" = "${QUERY}" ]]; then
+                START=${i}
+            fi
+        done
+
+    fi
+
+    echo ${START}
+}
 
 function check_restart() {
 
@@ -239,7 +261,7 @@ function validate_build_deploy() {
 
 
 # Begin Chained Components
-function do_ocp_components() {
+function do_configure_ocp() {
 
     if check_restart $1
     then
@@ -271,6 +293,7 @@ function do_ocp_components() {
     echo
     oc $ACTION -n ${IOT_OCP_PROJECT} -f ${SCRIPT_BASE_DIR}/support/templates/jboss-image-streams.json
     oc $ACTION -n ${IOT_OCP_PROJECT} -f ${SCRIPT_BASE_DIR}/support/templates/fis-image-streams.json
+    oc $ACTION -n ${IOT_OCP_PROJECT} -f ${SCRIPT_BASE_DIR}/support/templates/openjdk18-openshift-is.json
     oc $ACTION -n ${IOT_OCP_PROJECT} -f ${SCRIPT_BASE_DIR}/support/templates/${ZEPPELIN_IMAGE}-is.json
 
     echo
@@ -284,9 +307,8 @@ function do_ocp_components() {
     oc import-image -n ${IOT_OCP_PROJECT} jboss-decisionserver63-openshift --all=true >/dev/null 2>&1
     oc import-image -n ${IOT_OCP_PROJECT} jboss-amq-62 --all=true >/dev/null 2>&1
     oc import-image -n ${IOT_OCP_PROJECT} fis-karaf-openshift --all=true >/dev/null 2>&1
+    oc import-image -n ${IOT_OCP_PROJECT} openjdk18-openshift --all=true >/dev/null 2>&1
     oc import-image -n ${IOT_OCP_PROJECT} ${ZEPPELIN_IMAGE} --all=true >/dev/null 2>&1
-
-    do_postgresql
 
 }
 
@@ -304,7 +326,7 @@ function do_postgresql() {
     echo
     echo "Deploying PostgreSQL..."
     echo
-    oc process -v=POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE},POSTGRESQL_USER=${POSTGRESQL_USERNAME},POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD} -l ${POSTGRESQL_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/postgresql-persistent.json | oc create -n ${IOT_OCP_PROJECT} -f-
+    oc process -v=POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE} -v=POSTGRESQL_USER=${POSTGRESQL_USERNAME} -v=POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD} -l ${POSTGRESQL_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/postgresql-persistent.json | oc create -n ${IOT_OCP_PROJECT} -f-
 
     echo
     echo "Waiting for PostgreSQL to deploy..."
@@ -323,24 +345,35 @@ function do_postgresql() {
 
     oc rsh -t ${POSTGRESQL_POD_NAME}  bash -c 'psql -f /tmp/sql/postgresql-iot.sql --variable=measureOwner=$POSTGRESQL_USER $POSTGRESQL_DATABASE' 
 
-    do_amq
-
 }
 
 function do_amq() {
     
     CURRENT_STAGE="amq"
-    
+
     if check_restart $1
     then
         oc delete all -l ${AMQ_LABEL}
+        oc delete sa amq-service-account
+        oc delete secret amq-app-secret
         sleep 15
     fi
 
     echo
+    echo "Creating AMQ Service Account..."
+    echo
+    oc create serviceaccount amq-service-account
+    oc policy add-role-to-user edit system:serviceaccount:${IOT_OCP_PROJECT}:amq-service-account
+
+    echo
+    echo "Creating AMQ Secret..."
+    echo
+    oc secrets new amq-app-secret ${SCRIPT_BASE_DIR}/support/amq-ssl
+
+    echo
     echo "Deploying AMQ..."
     echo
-    oc process -v=MQ_USERNAME=${MQ_USER},MQ_PASSWORD=${MQ_PASSWORD},IMAGE_STREAM_NAMESPACE=${IOT_OCP_PROJECT} -l ${AMQ_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/amq62-basic.json | oc create -n ${IOT_OCP_PROJECT} -f-
+    oc process -v=MQ_USERNAME=${MQ_USER} -v=MQ_PASSWORD=${MQ_PASSWORD} -v=IMAGE_STREAM_NAMESPACE=${IOT_OCP_PROJECT} -v=AMQ_TRUSTSTORE_PASSWORD=${AMQ_SSL_PASSWORD} -v=AMQ_KEYSTORE_PASSWORD=${AMQ_SSL_PASSWORD} -l ${AMQ_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/amq62-ssl.json | oc create -n ${IOT_OCP_PROJECT} -f-
 
     echo
     echo "Waiting for AMQ to deploy..."
@@ -348,11 +381,9 @@ function do_amq() {
     wait_for_application_deployment "broker-amq"
 
     echo
-    echo "Exposing MQTT Route..."
+    echo "Creating Secure AMQ Route..."
     echo
-    oc expose svc -n ${IOT_OCP_PROJECT} -l ${AMQ_LABEL} broker-amq-mqtt
-
-    do_kie
+    oc create route passthrough -n ${IOT_OCP_PROJECT} broker-amq-mqtt --service=broker-amq-tcp-ssl --port=61617
 
 }
 
@@ -369,11 +400,9 @@ function do_kie() {
     echo
     echo "Deploying Decision Server..."
     echo
-    oc process -v=KIE_SERVER_USER="${KIE_USER}",KIE_SERVER_PASSWORD="${KIE_PASSWORD}",IMAGE_STREAM_NAMESPACE=${IOT_OCP_PROJECT},SOURCE_REPOSITORY_REF=${GIT_BRANCH} -l ${KIE_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/decisionserver63-basic-s2i.json | oc create -n ${IOT_OCP_PROJECT} -f-
+    oc process -v=KIE_SERVER_USER="${KIE_USER}" -v=KIE_SERVER_PASSWORD="${KIE_PASSWORD}" -v=IMAGE_STREAM_NAMESPACE=${IOT_OCP_PROJECT} -v=SOURCE_REPOSITORY_REF=${GIT_BRANCH} -l ${KIE_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/decisionserver63-basic-s2i.json | oc create -n ${IOT_OCP_PROJECT} -f-
 
     validate_build_deploy "kie-app"
-
-    do_fis
 
 }
 
@@ -390,11 +419,9 @@ function do_fis() {
     echo
     echo "Deploying FIS Application..."
     echo
-    oc process -v=KIE_APP_USER="${KIE_USER}",KIE_APP_PASSWORD="${KIE_PASSWORD}",GIT_REF=${GIT_BRANCH},BROKER_AMQ_USERNAME="${MQ_USER}",BROKER_AMQ_PASSWORD="${MQ_PASSWORD}",IMAGE_STREAM_NAMESPACE=${IOT_OCP_PROJECT},POSTGRESQL_USER=${POSTGRESQL_USERNAME},POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD},POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE} -l ${FIS_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/fis-generic-template-build.json | oc create -n ${IOT_OCP_PROJECT} -f-
+    oc process -v=KIE_APP_USER="${KIE_USER}" -v=KIE_APP_PASSWORD="${KIE_PASSWORD}" -v=GIT_REF=${GIT_BRANCH} -v=BROKER_AMQ_USERNAME="${MQ_USER}" -v=BROKER_AMQ_PASSWORD="${MQ_PASSWORD}" -v=IMAGE_STREAM_NAMESPACE=${IOT_OCP_PROJECT} -v=POSTGRESQL_USER=${POSTGRESQL_USERNAME} -v=POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD} -v=POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE} -l ${FIS_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/fis-generic-template-build.json | oc create -n ${IOT_OCP_PROJECT} -f-
 
     validate_build_deploy "fis-app"
-
-    do_software_sensor
 
 }
 
@@ -411,11 +438,9 @@ function do_software_sensor() {
     echo
     echo "Deploying Software Sensor Application..."
     echo
-    oc process -v=MQTT_USERNAME="${MQ_USER}",MQTT_PASSWORD="${MQ_PASSWORD}",SOURCE_REPOSITORY_REF=${GIT_BRANCH} -l ${SOFTWARE_SENSOR_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/software-sensor-template.json | oc create -n ${IOT_OCP_PROJECT} -f-
+    oc process -v=MQTT_USERNAME="${MQ_USER}" -v=MQTT_PASSWORD="${MQ_PASSWORD}" -v=SOURCE_REPOSITORY_REF=${GIT_BRANCH} -v=IMAGE_STREAM_NAMESPACE=${IOT_OCP_PROJECT} -l ${SOFTWARE_SENSOR_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/software-sensor-template.json | oc create -n ${IOT_OCP_PROJECT} -f-
 
     validate_build_deploy "software-sensor"
-
-    do_build_zeppelin
 
 }
 
@@ -433,13 +458,11 @@ function do_build_zeppelin() {
     echo
     echo "Deploying Visualization Tool..."
     echo
-    oc process -v=SOURCE_REPOSITORY_REF=${GIT_BRANCH},BASE_IMAGESTREAMTAG=${ZEPPELIN_BASE_IMAGESTREAM} -l ${ZEPPELIN_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/rhel-zeppelin.json | oc create -n ${IOT_OCP_PROJECT} -f-
+    oc process -v=SOURCE_REPOSITORY_REF=${GIT_BRANCH} -v=BASE_IMAGESTREAMTAG=${ZEPPELIN_BASE_IMAGESTREAM} -l ${ZEPPELIN_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/rhel-zeppelin.json | oc create -n ${IOT_OCP_PROJECT} -f-
 
     validate_build_deploy "rhel-zeppelin"
 
     sleep 10
-
-    do_configure_zeppelin
 
 }
 
@@ -482,6 +505,9 @@ do
     --project-suffix=*)
       IOT_OCP_PROJECT="${IOT_OCP_PROJECT}-${i#*=}"
       shift;;
+    --skip-steps=*)
+      SKIP_STEPS="${i#*=}"
+      shift;;
     --user=*)
       ADMIN_ADDL_USERNAME="${i#*=}"
       shift;;
@@ -504,63 +530,59 @@ if [ ! -z ${USER_ZEPPELIN_BASE} ]; then
     fi
 fi
 
+############################################
 
+START_STAGE_INDEX=0
+
+# Determine step to restart from
 if [ ! -z ${RESTART_OPTION} ]; then
 
-    case $RESTART_OPTION in
-        "configure-ocp")
-          echo "Restarting at Step \"configure-ocp\""
-          do_ocp_components "restart"
-        ;;
-        "postgresql")
-          echo "Restarting at Step \"postgresql\""
-          do_postgresql "restart"
-        ;;
-        "amq")
-          echo "Restarting at Step \"amq\""
-          do_amq "restart"
-        ;;
-        "kie")
-          echo "Restarting at Step \"kie\""
-          do_kie "restart"
-        ;;
-        "fis")
-          echo "Restarting at Step \"fis\""
-          do_fis "restart"
-        ;;
-        "software-sensor")
-          echo "Restarting at Step \"software-sensor\""
-          do_software_sensor "restart"
-        ;;
-        "build-zeppelin")
-          echo "Restarting at Step \"build-zeppelin\""
-          do_build_zeppelin "restart"
-        ;;  
-        "configure-zeppelin")
-          echo "Restarting at Step \"configure-zeppelin\""
-          do_configure_zeppelin "restart";
-          ;;
-          *)
-          echo "
-           Invalid Restart Option: $2
-          
-           Restart Options
-             * configure-ocp
-             * postgresql
-             * amq
-             * kie
-             * fis
-             * software-sensor
-             * build-zeppelin
-             * configure-zeppelin
-          "
-          exit 1
-    esac
+  # Check position to restart at
+  START_STAGE_INDEX=$(findIndex ${RESTART_OPTION})
 
-else
-    # Normal Execution
-    do_ocp_components
+  if [ $START_STAGE_INDEX -eq -1 ]; then
+      echo "Invalid Restart Option: $RESTART_OPTION"
+      echo
+      echo "Restart Options:"
+      for i in "${STAGES[@]}"; do
+          echo "   * ${i}" 
+      done
+
+      exit 1
+  fi
+
+  echo "Restarting at Step: ${RESTART_OPTION}"
+  echo
+
 fi
+
+#Run through steps
+for step in "${STAGES[@]:${START_STAGE_INDEX}}"
+do
+    for skipped_step in ${SKIP_STEPS//,/ } ; do
+        if [[ "${step}" = "${skipped_step}" ]]; then
+            echo "Skipping Step: ${step}"
+            echo
+            continue 2
+        fi
+    done
+
+    # Execute Step
+    echo "Executing Step: ${step}"
+    echo
+    
+    if [ "$step" == "${RESTART_OPTION}" ]; then
+        RESTART_SWITCH="restart"
+    else
+        RESTART_SWITCH=""
+    fi
+    
+    eval do_${step//-/_} ${RESTART_SWITCH}
+
+done
+
+
+##############################################
 
 echo "============================================="
 echo

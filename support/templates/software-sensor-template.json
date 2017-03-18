@@ -51,6 +51,17 @@
             "required": false
         },
         {
+          "description": "Namespace in which the Fuse ImageStreams are installed. These ImageStreams are normally installed in the openshift namespace. You should only need to modify this if you've installed the ImageStreams in a different namespace/project.",
+          "name": "IMAGE_STREAM_NAMESPACE",
+          "value": "openshift",
+          "required": true
+        },
+        {
+          "name": "BUILDER_VERSION",
+          "value": "1.0",
+          "description": "Builder version"
+        },
+        {
             "description": "GitHub trigger secret",
             "name": "GITHUB_WEBHOOK_SECRET",
             "from": "[a-zA-Z0-9]{8}",
@@ -120,8 +131,9 @@
                     "sourceStrategy": {
                         "forcePull": true,
                         "from": {
-                            "kind": "DockerImage",
-                            "name": "fabric8/s2i-java"
+                          "kind": "ImageStreamTag",
+                          "namespace": "${IMAGE_STREAM_NAMESPACE}",
+                          "name": "openjdk18-openshift:${BUILDER_VERSION}"
                         }
                     }
                 },
