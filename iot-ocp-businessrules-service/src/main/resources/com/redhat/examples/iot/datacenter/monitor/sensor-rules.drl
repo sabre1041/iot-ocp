@@ -26,6 +26,17 @@ rule "OrganVibrationTooHigh"
 		update( $t );
 end 
 
+rule "OrganLightTooHigh"
+	lock-on-active true
+	when
+		$t : Measure( category == "Organ", dataType == "light", payload != null, Double.parseDouble(payload) >= 50 )
+	then
+		System.out.println("Rule 'high light' fired as light is " + $t.getPayload());
+		$t.setErrorCode(1);
+		$t.setErrorMessage("Ambient light too high");
+		update( $t );
+end 
+
 rule "MachineTemperatureTooHigh"
 	lock-on-active true
 	when
@@ -45,5 +56,16 @@ rule "MachineVibrationTooHigh"
 		System.out.println("Rule 'high vibration' fired as vibration is " + $t.getPayload());
 		$t.setErrorCode(1);
 		$t.setErrorMessage("Vibration too high");
+		update( $t );
+end 
+
+rule "MachineLightTooHigh"
+	lock-on-active true
+	when
+		$t : Measure( category == "Machine", dataType == "light", payload != null, Double.parseDouble(payload) >= 50 )
+	then
+		System.out.println("Rule 'high light' fired as light is " + $t.getPayload());
+		$t.setErrorCode(1);
+		$t.setErrorMessage("Ambient light too high");
 		update( $t );
 end 
