@@ -1,12 +1,7 @@
 package com.redhat.examples.iot;
 
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.TimeZone;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.slf4j.Logger;
@@ -19,16 +14,6 @@ import com.redhat.examples.iot.sensor.Sensor;
 public class SensorRunner implements Runnable {
 	
     private static final Logger log = LoggerFactory.getLogger(SchedulerManager.class);
-    
-    private static final ThreadLocal<SimpleDateFormat> dateFormat = new ThreadLocal<SimpleDateFormat>(){
-        @Override
-        protected SimpleDateFormat initialValue()
-        {
-        	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HHmm");
-            sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-        	return sdf;
-        }
-    };
 
     private final Sensor sensor;
     
@@ -80,9 +65,9 @@ public class SensorRunner implements Runnable {
 		sb.append(SLASH);
 		sb.append(SW_CODE);
 		sb.append(SLASH);
-		sb.append(sensor.getType());
-		sb.append(SLASH);
 		sb.append(deviceId);
+		sb.append(SLASH);
+		sb.append(sensor.getType());
 		
 		topicName = sb.toString();
 	}

@@ -24,16 +24,16 @@ public class Measure implements Serializable {
 	
 	@DataField(pos = 4, required = true) 
 	private String sensorType;
-
-	@DataField(pos = 5, required = true)
-	private String dataType;
 		
-	@DataField(pos = 6, required = true) 
+	@DataField(pos = 5, required = true)
 	private String deviceId;
-	
+
+	@DataField(pos = 6, required = true)
+	private String dataType;
+
 	@DataField(pos = 7, required = false) 
 	private int errorCode;
-	
+
 	@DataField(pos = 8, required = false) 
 	private String errorMessage;
 
