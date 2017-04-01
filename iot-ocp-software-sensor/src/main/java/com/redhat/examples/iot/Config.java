@@ -54,7 +54,7 @@ public class Config {
 		
 		String brokerURL = String.format("tcp://%s:%s", mqttServiceName, mqttServicePort);
 		
-		return new MqttProducer(brokerURL, mqttUsername, mqttPassword, appName);
+		return new MqttProducer(brokerURL, mqttUsername, mqttPassword, deviceId);
 	}
 	
 	public String getDeviceId() {

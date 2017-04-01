@@ -21,19 +21,19 @@ public class MqttProducer {
 	private final String brokerURL;
 	private final String user;
 	private final String password;
-	private final String appName;
+	private final String deviceId;
 
 	private static final int QOS = 2;
 	
     private static final Logger log = LoggerFactory.getLogger(MqttProducer.class);
 
 	
-	public MqttProducer(String brokerURL, String user, String password, String appName) {
+	public MqttProducer(String brokerURL, String user, String password, String deviceId) {
 	
 		this.brokerURL = brokerURL;
 		this.user = user;
 		this.password = password;
-		this.appName = appName;
+		this.deviceId = deviceId;
 		
 	}
 	
@@ -44,7 +44,7 @@ public class MqttProducer {
 		}
 		
 		try {
-			client = new MqttClient(brokerURL, appName);
+			client = new MqttClient(brokerURL, deviceId);
 			options = new MqttConnectOptions ();
 			options.setUserName(user);
 			options.setPassword(password.toCharArray());
