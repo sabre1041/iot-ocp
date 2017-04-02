@@ -1,0 +1,105 @@
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "shared-resource-template",
+        "annotations": {
+            "description": "Template for creating permissions to share resources in a project"
+        }
+    },
+    "objects": [
+        {
+            "kind": "Role",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${ROLE_NAME}",
+                "creationTimestamp": null
+            },
+            "rules": [
+                {
+                    "verbs": [
+                        "get",
+                        "list"
+                    ],
+                    "attributeRestrictions": null,
+                    "apiGroups": null,
+                    "resources": [
+                        "imagestreamimages",
+                        "imagestreamimports",
+                        "imagestreammappings",
+                        "imagestreams",
+                        "imagestreamtags",
+                        "templates"
+                    ]
+                },
+                {
+                    "verbs": [
+                        "get"
+                    ],
+                    "attributeRestrictions": null,
+                    "apiGroups": null,
+                    "resources": [
+                        "imagestreams/layers"
+                    ]
+                }
+            ]
+        },
+        {
+            "kind": "PolicyBinding",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "openshift:default",
+                "creationTimestamp": null
+            },
+            "policyRef": {
+                "namespace": "${NAMESPACE}",
+                "name": "default"
+            },
+            "roleBindings": [
+                {
+                    "name": "shared-resource-viewers",
+                    "roleBinding": {
+                        "metadata": {
+                            "name": "${ROLE_BINDING_NAME}",
+                            "namespace": "${NAMESPACE}"
+                        },
+                        "userNames": null,
+                        "groupNames": [
+                            "system:authenticated"
+                        ],
+                        "subjects": [
+                            {
+                                "kind": "SystemGroup",
+                                "name": "system:authenticated"
+                            }
+                        ],
+                        "roleRef": {
+                            "namespace": "${NAMESPACE}",
+                            "name": "${ROLE_NAME}"
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "parameters": [
+        {
+            "name": "NAMESPACE",
+            "description": "Name of the common project contanining enterprise resources",
+            "value": "iot-ocp-resources"
+        },
+        {
+            "name": "ROLE_NAME",
+            "description": "Name of the role",
+            "value": "shared-resource-viewer"
+        },
+        {
+            "name": "ROLE_BINDING_NAME",
+            "description": "Name of the role binding",
+            "value": "shared-resource-viewers"
+        }
+    ],
+    "labels": {
+        "template": "shared-resources-template"
+    }
+}

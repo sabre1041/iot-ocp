@@ -1,0 +1,235 @@
+{
+  "apiVersion": "v1",
+  "kind": "Template",
+  "labels": {},
+  "metadata": {
+    "annotations": {
+      "description": "FIS Generic Template",
+      "iconClass": "icon-java"
+    },
+    "labels": {},
+    "name": "integration-fis"
+  },
+  "parameters": [
+    {
+      "name": "APP_NAME",
+      "value": "integration-fis",
+      "description": "Application Name"
+    },
+    {
+      "description": "Namespace in which the Fuse ImageStreams are installed. These ImageStreams are normally installed in the openshift namespace. You should only need to modify this if you've installed the ImageStreams in a different namespace/project.",
+      "name": "IMAGE_STREAM_NAMESPACE",
+      "value": "iot-ocp-resources",
+      "required": true
+    },
+    {
+      "name": "POSTGRESQL_SECRET",
+      "required": true,
+      "value": "postgresql",
+      "description": "Name of the Postgresql Secret"
+    },
+    {
+      "name": "RULES_APP",
+      "required": true,
+      "value": "rules-brms",
+      "description": "Name of the Rules Application"
+    },
+    {
+      "name": "AMQ_SECRET",
+      "required": true,
+      "value": "broker",
+      "description": "Name of the AMQ Secret"
+    }
+  ],
+  "objects": [
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "annotations": {
+        },
+        "labels": {
+          "container": "karaf",
+          "component": "${APP_NAME}"
+        },
+        "name": "${APP_NAME}"
+      },
+      "spec": {
+        "clusterIP": "None",
+        "deprecatedPublicIPs": [],
+        "ports": [
+          {
+            "port": 9412,
+            "protocol": "TCP",
+            "targetPort": 8181
+          }
+        ],
+        "selector": {
+          "container": "karaf",
+          "component": "${APP_NAME}"
+        }
+      }
+    },
+    {
+      "kind": "DeploymentConfig",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "${APP_NAME}",
+        "creationTimestamp": null,
+        "labels": {
+          "component": "${APP_NAME}",
+          "container": "karaf"
+        }
+      },
+      "spec": {
+        "strategy": {
+          "resources": {}
+        },
+        "triggers": [
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "ImageChange",
+            "imageChangeParams": {
+              "automatic": true,
+              "containerNames": [
+                "${APP_NAME}"
+              ],
+              "from": {
+                "kind": "ImageStreamTag",
+                "name": "${APP_NAME}:latest",
+                "namespace": "${IMAGE_STREAM_NAMESPACE}"
+              }
+            }
+          }
+        ],
+        "replicas": 1,
+        "selector": {
+          "component": "${APP_NAME}",
+          "container": "karaf",
+          "deploymentconfig": "${APP_NAME}"
+        },
+        "template": {
+          "metadata": {
+            "creationTimestamp": null,
+            "labels": {
+              "component": "${APP_NAME}",
+              "container": "karaf",
+              "deploymentconfig": "${APP_NAME}"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "name": "${APP_NAME}",
+                "image": "${APP_NAME}",
+                "imagePullPolicy": "IfNotPresent",
+                "readinessProbe": {
+                  "exec": {
+                    "command": [
+                      "/bin/bash",
+                      "-c",
+                      "(curl -f 127.0.0.1:8778) >/dev/null 2>&1; test $? != 7"
+                    ]
+                  },
+                  "initialDelaySeconds": 30,
+                  "timeoutSeconds": 5
+                },
+                "ports": [
+                  {
+                    "containerPort": 8181,
+                    "name": "http"
+                  },
+                  {
+                    "containerPort": 8778,
+                    "name": "jolokia"
+                  }
+                ],
+                "env": [
+                    {
+                        "name": "APP_ID",
+                        "valueFrom": {
+                            "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "metadata.name"
+                            }
+                        }
+                    },
+                    {
+                        "name": "KIE_APP_NAME",
+                        "value": "${RULES_APP}"
+                    },
+                  {
+                      "name": "KIE_APP_USER",
+                      "valueFrom": {
+                          "secretKeyRef": {
+                              "key": "kie-server-user",
+                              "name": "${RULES_APP}"
+                          }
+                      }
+                  },
+                  {
+                      "name": "KIE_APP_PASSWORD",
+                      "valueFrom": {
+                          "secretKeyRef": {
+                              "key": "kie-server-password",
+                              "name": "${RULES_APP}"
+                          }
+                      }
+                  },
+                  {
+                      "name": "BROKER_AMQ_USERNAME",
+                      "valueFrom": {
+                          "secretKeyRef": {
+                              "key": "amq-user",
+                              "name": "${AMQ_SECRET}"
+                          }
+                      }
+                  },
+                  {
+                      "name": "BROKER_AMQ_PASSWORD",
+                      "valueFrom": {
+                          "secretKeyRef": {
+                              "key": "amq-password",
+                              "name": "${AMQ_SECRET}"
+                          }
+                      }
+                  },
+                  {
+                      "name": "POSTGRESQL_USER",
+                      "valueFrom": {
+                          "secretKeyRef": {
+                              "key": "postgresql-user",
+                              "name": "${POSTGRESQL_SECRET}"
+                          }
+                      }
+                  },
+                  {
+                      "name": "POSTGRESQL_PASSWORD",
+                      "valueFrom": {
+                          "secretKeyRef": {
+                              "key": "postgresql-password",
+                              "name": "${POSTGRESQL_SECRET}"
+                          }
+                      }
+                  },
+                  {
+                      "name": "POSTGRESQL_DATABASE",
+                      "valueFrom": {
+                          "secretKeyRef": {
+                              "key": "postgresql-database",
+                              "name": "${POSTGRESQL_SECRET}"
+                          }
+                      }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "status": {}
+    }
+  ]
+}

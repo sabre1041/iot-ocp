@@ -1,0 +1,104 @@
+{
+    "apiVersion": "v1",
+    "kind": "Template",
+    "metadata": {
+        "name": "db-setup-postgresql-seed",
+        "labels": {
+            "app": "db-setup-postgresql-seed"
+        }
+    },
+    "objects": [
+        {
+            "kind": "ConfigMap",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "db-setup-postgresql-seed",
+                "creationTimestamp": null
+            },
+            "data": {
+                "seed-script.sql": "CREATE TABLE measure\n(\n    id BIGSERIAL NOT NULL PRIMARY KEY,\n    sensor_type VARCHAR(50) NOT NULL,\n    data_type VARCHAR(50) NOT NULL,\n    device_id VARCHAR(50) NOT NULL,\n    category VARCHAR(50) NOT NULL,\n    payload VARCHAR(255) NOT NULL,\n    error_code INTEGER NOT NULL,\n    error_message VARCHAR(255),\n    time_stamp TIMESTAMP NOT NULL\n);\nALTER TABLE measure OWNER TO :measureOwner"
+            }
+        },
+        {
+            "apiVersion": "batch/v1",
+            "kind": "Job",
+            "metadata": {
+                "labels": {
+                    "app": "postgresql-seed"
+                },
+                "name": "postgresql-seed"
+            },
+            "spec": {
+                "paralellism": 0,
+                "completions": 1,
+                "template": {
+                    "metadata": {
+                        "name": "raise-gogs-tmpl"
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "command": [
+                                    "/bin/bash",
+                                    "-c",
+                                    "PGPASSWORD=${POSTGRESQL_PASSWORD} psql -f /data/scripts/seed-script.sql --variable=measureOwner=$POSTGRESQL_USER -h ${POSTGRESQL_SERVICE_HOST} -p ${POSTGRESQL_SERVICE_PORT} -U ${POSTGRESQL_USER}  ${POSTGRESQL_DATABASE}"
+                                ],
+                                "env": [
+                                    {
+                                        "name": "POSTGRESQL_USER",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "name": "postgresql",
+                                                "key": "postgresql-user"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "POSTGRESQL_PASSWORD",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "name": "postgresql",
+                                                "key": "postgresql-password"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "POSTGRESQL_DATABASE",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "name": "postgresql",
+                                                "key": "postgresql-database"
+                                            }
+                                        }
+                                    }
+                                ],
+                                "image": "registry.access.redhat.com/rhscl/postgresql-95-rhel7:latest",
+                                "name": "postgresql-seed",
+                                "imagePullPolicy": "IfNotPresent",
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/data/scripts",
+                                        "name": "postgresql-seed-volume"
+                                    }
+                                ]
+                            }
+                        ],
+                        "restartPolicy": "Never",
+                        "volumes": [
+                            {
+                                "configMap": {
+                                    "name": "db-setup-postgresql-seed"
+                                },
+                                "name": "postgresql-seed-volume"
+                            }
+                        ]
+                    }
+                },
+                "restartPolicy": "Never"
+            }
+        }
+    ],
+    "parameters": [
+
+    ]
+}
