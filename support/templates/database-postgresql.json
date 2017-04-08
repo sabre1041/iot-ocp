@@ -2,7 +2,7 @@
     "kind": "Template",
     "apiVersion": "v1",
     "metadata": {
-        "name": "postgresql-persistent",
+        "name": "database-postgresql",
         "creationTimestamp": null,
         "annotations": {
             "description": "PostgreSQL database service, with persistent storage.  Scaling to more than one replica is not supported.  You must have persistent volumes available in your cluster to use this template.",
@@ -11,6 +11,18 @@
         }
     },
     "objects": [
+        {
+            "apiVersion": "v1",
+            "kind": "Secret",
+            "metadata": {
+                "name": "${DATABASE_SERVICE_NAME}"
+            },
+            "stringData": {
+                "postgresql-password": "${POSTGRESQL_PASSWORD}",
+                "postgresql-user": "${POSTGRESQL_USER}",
+                "postgresql-database": "${POSTGRESQL_DATABASE}"
+            }
+        },
         {
             "kind": "Service",
             "apiVersion": "v1",
@@ -131,15 +143,30 @@
                                 "env": [
                                     {
                                         "name": "POSTGRESQL_USER",
-                                        "value": "${POSTGRESQL_USER}"
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "postgresql-user",
+                                                "name": "${DATABASE_SERVICE_NAME}"
+                                            }
+                                        }
                                     },
                                     {
                                         "name": "POSTGRESQL_PASSWORD",
-                                        "value": "${POSTGRESQL_PASSWORD}"
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "postgresql-password",
+                                                "name": "${DATABASE_SERVICE_NAME}"
+                                            }
+                                        }
                                     },
                                     {
                                         "name": "POSTGRESQL_DATABASE",
-                                        "value": "${POSTGRESQL_DATABASE}"
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "postgresql-database",
+                                                "name": "${DATABASE_SERVICE_NAME}"
+                                            }
+                                        }
                                     }
                                 ],
                                 "resources": {
@@ -154,7 +181,7 @@
                                     }
                                 ],
                                 "terminationMessagePath": "/dev/termination-log",
-                                "imagePullPolicy": "IfNotPresent",
+                                "imagePullPolicy": "Always",
                                 "capabilities": {},
                                 "securityContext": {
                                     "capabilities": {},
@@ -203,7 +230,7 @@
             "displayName": "PostgreSQL User",
             "description": "Username for PostgreSQL user that will be used for accessing the database.",
             "generate": "expression",
-            "from": "user[A-Z0-9]{3}",
+            "from": "user[a-z0-9]{3}",
             "required": true
         },
         {
@@ -218,7 +245,7 @@
             "name": "POSTGRESQL_DATABASE",
             "displayName": "PostgreSQL Database Name",
             "description": "Name of the PostgreSQL database accessed.",
-            "value": "sampledb",
+            "value": "iot",
             "required": true
         },
         {

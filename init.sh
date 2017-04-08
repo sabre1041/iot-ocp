@@ -19,17 +19,17 @@ DEPLOYMENT_CHECK_TIMES=60
 CURRENT_STAGE=
 POSTGRESQL_LABEL="iotphase=postgresql"
 AMQ_LABEL="iotphase=amq"
-KIE_LABEL="iotphase=kie"
-FIS_LABEL="iotphase=fis"
+KIE_LABEL="iotphase=rules"
+FIS_LABEL="iotphase=integration"
 SOFTWARE_SENSOR_LABEL="iotphase=software-sensor"
-ZEPPELIN_LABEL="iotphase=zeppelin"
+ZEPPELIN_LABEL="iotphase=visualization"
 ZEPPELIN_RHEL_BASE_IMAGESTREAM="rhel7:7.2"
 ZEPPELIN_CENTOS_BASE_IMAGESTREAM="centos:7"
 ZEPPELIN_BASE_IMAGESTREAM=${ZEPPELIN_RHEL_BASE_IMAGESTREAM}
 PROJECT_SUFFIX=
 ADMIN_ADDL_USERNAME=
 SKIP_STEPS=
-STAGES=(configure-ocp postgresql amq kie fis software-sensor build-zeppelin configure-zeppelin)
+STAGES=(configure-ocp postgresql amq rules integration software-sensor build-zeppelin configure-zeppelin)
 
 trap exit_message EXIT
 
@@ -326,7 +326,7 @@ function do_postgresql() {
     echo
     echo "Deploying PostgreSQL..."
     echo
-    oc process -v=POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE} -v=POSTGRESQL_USER=${POSTGRESQL_USERNAME} -v=POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD} -l ${POSTGRESQL_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/postgresql-persistent.json | oc create -n ${IOT_OCP_PROJECT} -f-
+    oc process -v=POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE} -v=POSTGRESQL_USER=${POSTGRESQL_USERNAME} -v=POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD} -l ${POSTGRESQL_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/database-postgresql.json | oc create -n ${IOT_OCP_PROJECT} -f-
 
     echo
     echo "Waiting for PostgreSQL to deploy..."
@@ -354,42 +354,24 @@ function do_amq() {
     if check_restart $1
     then
         oc delete all -l ${AMQ_LABEL}
-        oc delete sa amq-service-account
-        oc delete secret amq-app-secret
         sleep 15
     fi
 
     echo
-    echo "Creating AMQ Service Account..."
-    echo
-    oc create serviceaccount amq-service-account
-    oc policy add-role-to-user edit system:serviceaccount:${IOT_OCP_PROJECT}:amq-service-account
-
-    echo
-    echo "Creating AMQ Secret..."
-    echo
-    oc secrets new amq-app-secret ${SCRIPT_BASE_DIR}/support/amq-ssl
-
-    echo
     echo "Deploying AMQ..."
     echo
-    oc process -v=MQ_USERNAME=${MQ_USER} -v=MQ_PASSWORD=${MQ_PASSWORD} -v=IMAGE_STREAM_NAMESPACE=${IOT_OCP_PROJECT} -v=AMQ_TRUSTSTORE_PASSWORD=${AMQ_SSL_PASSWORD} -v=AMQ_KEYSTORE_PASSWORD=${AMQ_SSL_PASSWORD} -l ${AMQ_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/amq62-ssl.json | oc create -n ${IOT_OCP_PROJECT} -f-
+    oc process -v=MQ_USERNAME=${MQ_USER} -v=MQ_PASSWORD=${MQ_PASSWORD} -v=IMAGE_STREAM_NAMESPACE=${IOT_OCP_PROJECT} -v=AMQ_TRUSTSTORE_PASSWORD=${AMQ_SSL_PASSWORD} -v=AMQ_KEYSTORE_PASSWORD=${AMQ_SSL_PASSWORD} -l ${AMQ_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/broker-amq.json | oc create -n ${IOT_OCP_PROJECT} -f-
 
     echo
     echo "Waiting for AMQ to deploy..."
     echo
     wait_for_application_deployment "broker-amq"
 
-    echo
-    echo "Creating Secure AMQ Route..."
-    echo
-    oc create route passthrough -n ${IOT_OCP_PROJECT} broker-amq-mqtt --service=broker-amq-tcp-ssl --port=61617
-
 }
 
-function do_kie() {
+function do_rules() {
     
-    CURRENT_STAGE="kie"
+    CURRENT_STAGE="rules"
 
     if check_restart $1
     then
@@ -400,15 +382,15 @@ function do_kie() {
     echo
     echo "Deploying Decision Server..."
     echo
-    oc process -v=KIE_SERVER_USER="${KIE_USER}" -v=KIE_SERVER_PASSWORD="${KIE_PASSWORD}" -v=IMAGE_STREAM_NAMESPACE=${IOT_OCP_PROJECT} -v=SOURCE_REPOSITORY_REF=${GIT_BRANCH} -l ${KIE_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/decisionserver63-basic-s2i.json | oc create -n ${IOT_OCP_PROJECT} -f-
+    oc process -v=KIE_SERVER_USER="${KIE_USER}" -v=KIE_SERVER_PASSWORD="${KIE_PASSWORD}" -v=IMAGE_STREAM_NAMESPACE=${IOT_OCP_PROJECT} -v=SOURCE_REPOSITORY_REF=${GIT_BRANCH} -l ${KIE_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/rules-brms.json | oc create -n ${IOT_OCP_PROJECT} -f-
 
-    validate_build_deploy "kie-app"
+    validate_build_deploy "rules-brms"
 
 }
 
-function do_fis() {
+function do_integration() {
     
-    CURRENT_STAGE="fis"
+    CURRENT_STAGE="integration"
 
     if check_restart $1
     then
@@ -417,11 +399,11 @@ function do_fis() {
     fi
 
     echo
-    echo "Deploying FIS Application..."
+    echo "Deploying Integration Application..."
     echo
-    oc process -v=KIE_APP_USER="${KIE_USER}" -v=KIE_APP_PASSWORD="${KIE_PASSWORD}" -v=GIT_REF=${GIT_BRANCH} -v=BROKER_AMQ_USERNAME="${MQ_USER}" -v=BROKER_AMQ_PASSWORD="${MQ_PASSWORD}" -v=IMAGE_STREAM_NAMESPACE=${IOT_OCP_PROJECT} -v=POSTGRESQL_USER=${POSTGRESQL_USERNAME} -v=POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD} -v=POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE} -l ${FIS_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/fis-generic-template-build.json | oc create -n ${IOT_OCP_PROJECT} -f-
+    oc process -v=GIT_REF=${GIT_BRANCH} -v=IMAGE_STREAM_NAMESPACE=${IOT_OCP_PROJECT} -l ${FIS_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/integration-fis.json | oc create -n ${IOT_OCP_PROJECT} -f-
 
-    validate_build_deploy "fis-app"
+    validate_build_deploy "integration-fis"
 
 }
 
@@ -438,7 +420,7 @@ function do_software_sensor() {
     echo
     echo "Deploying Software Sensor Application..."
     echo
-    oc process -v=MQTT_USERNAME="${MQ_USER}" -v=MQTT_PASSWORD="${MQ_PASSWORD}" -v=SOURCE_REPOSITORY_REF=${GIT_BRANCH} -v=IMAGE_STREAM_NAMESPACE=${IOT_OCP_PROJECT} -l ${SOFTWARE_SENSOR_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/software-sensor-template.json | oc create -n ${IOT_OCP_PROJECT} -f-
+    oc process -v=SOURCE_REPOSITORY_REF=${GIT_BRANCH} -v=IMAGE_STREAM_NAMESPACE=${IOT_OCP_PROJECT} -l ${SOFTWARE_SENSOR_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/software-sensor.json | oc create -n ${IOT_OCP_PROJECT} -f-
 
     validate_build_deploy "software-sensor"
 
@@ -458,9 +440,9 @@ function do_build_zeppelin() {
     echo
     echo "Deploying Visualization Tool..."
     echo
-    oc process -v=SOURCE_REPOSITORY_REF=${GIT_BRANCH} -v=BASE_IMAGESTREAMTAG=${ZEPPELIN_BASE_IMAGESTREAM} -l ${ZEPPELIN_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/rhel-zeppelin.json | oc create -n ${IOT_OCP_PROJECT} -f-
+    oc process -v=SOURCE_REPOSITORY_REF=${GIT_BRANCH} -v=BASE_IMAGESTREAMTAG=${ZEPPELIN_BASE_IMAGESTREAM} -l ${ZEPPELIN_LABEL} -f ${SCRIPT_BASE_DIR}/support/templates/visualization-zeppelin.json | oc create -n ${IOT_OCP_PROJECT} -f-
 
-    validate_build_deploy "rhel-zeppelin"
+    validate_build_deploy "visualization-zeppelin"
 
     sleep 10
 
@@ -476,7 +458,7 @@ function do_configure_zeppelin() {
     echo
 
     # Get Route
-    ZEPPELIN_ROUTE=$(oc get routes rhel-zeppelin --template='{{ .spec.host }}')
+    ZEPPELIN_ROUTE=$(oc get routes visualization-zeppelin --template='{{ .spec.host }}')
 
     ZEPPELIN_STATUS=$(curl -s -o /dev/null -w '%{http_code}' -H "Content-Type: application/json" -X POST -d "{\"name\":\"iot-ocp\",\"group\":\"psql\",\"properties\":{\"postgresql.password\":\"${POSTGRESQL_PASSWORD}\",\"postgresql.max.result\":\"1000\",\"postgresql.user\":\"${POSTGRESQL_USERNAME}\",\"postgresql.url\":\"jdbc:postgresql://postgresql:5432/iot\",\"postgresql.driver.name\":\"org.postgresql.Driver\"},\"dependencies\":[],\"option\":{\"remote\":true,\"isExistingProcess\":false,\"perNoteSession\":false,\"perNoteProcess\":false},\"propertyValue\":\"\",\"propertyKey\":\"\"}" http://${ZEPPELIN_ROUTE}/api/interpreter/setting)
 

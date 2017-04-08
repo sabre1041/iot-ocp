@@ -76,14 +76,14 @@ To bring the project back up, the components should be _started_ in the followin
 
 0. PostgreSQL
 0. JBoss A-MQ
-0. Kie
+0. JBoss BRMS Decision Sever
 0. JBoss Fuse Integration Services (FIS)
 0. Simulated Software Sensor
 0. Apache Zeppelin
 
 == Copyright and License
 
-Copyright 2016 by Red Hat, Inc.
+Copyright 2017 by Red Hat, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not
 use this package except in compliance with the License (see the `LICENSE` file

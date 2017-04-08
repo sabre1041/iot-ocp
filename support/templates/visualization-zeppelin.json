@@ -3,34 +3,25 @@
     "apiVersion": "v1",
     "metadata": {
         "annotations": {
-            "description": "Software sensor application template.",
+            "description": "Zeppelin RHEL application template.",
             "iconClass": "icon-java",
             "tags": "java"
         },
-        "name": "software-sensor"
+        "name": "visualization-zeppelin"
     },
     "labels": {
-        "template": "software-sensor"
+        "template": "visualization-zeppelin"
     },
     "parameters": [
-	    {
-	        "description": "The user name to access the MQTT Broker.",
-	        "name": "MQTT_USERNAME",
-	        "value": "iotuser",
-	        "required": false
-	    },
-	    {
-	        "description": "The password to access the MQTT Broker. Must be different than username; must not be root, admin, or administrator; must contain at least 8 characters, 1 alphabetic character(s), 1 digit(s), and 1 non-alphanumeric symbol(s).",
-	        "name": "MQTT_PASSWORD",
-	        "from": "[a-zA-Z]{6}[0-9]{1}!",
-	        "generate": "expression",
-	        "required": false
-	    },
         {
             "description": "The name for the application.",
             "name": "APPLICATION_NAME",
-            "value": "software-sensor",
+            "value": "visualization-zeppelin",
             "required": true
+        },
+        {
+            "name": "HOSTNAME_HTTP",
+            "description": "Custom hostname for http service route.  Leave blank for default hostname, e.g.: \u003capplication-name\u003e-\u003cproject\u003e.\u003cdefault-domain-suffix\u003e"
         },
         {
             "description": "Git source URI for application",
@@ -47,19 +38,8 @@
         {
             "description": "Path within Git project to build; empty for root project directory.",
             "name": "CONTEXT_DIR",
-            "value": "iot-ocp-software-sensor",
+            "value": "rhel-zeppelin",
             "required": false
-        },
-        {
-          "description": "Namespace in which the Fuse ImageStreams are installed. These ImageStreams are normally installed in the openshift namespace. You should only need to modify this if you've installed the ImageStreams in a different namespace/project.",
-          "name": "IMAGE_STREAM_NAMESPACE",
-          "value": "openshift",
-          "required": true
-        },
-        {
-          "name": "BUILDER_VERSION",
-          "value": "1.0",
-          "description": "Builder version"
         },
         {
             "description": "GitHub trigger secret",
@@ -74,6 +54,19 @@
             "from": "[a-zA-Z0-9]{8}",
             "generate": "expression",
             "required": true
+        },
+        {
+            "description": "Base ImageStream Tag",
+            "name": "BASE_IMAGESTREAMTAG",
+            "value": "rhel7:7.2",
+            "required": true
+        },
+        {
+            "name": "VOLUME_CAPACITY",
+            "displayName": "Volume Capacity",
+            "description": "Volume space available for data, e.g. 512Mi, 2Gi.",
+            "value": "1Gi",
+            "required": true
         }
     ],
     "objects": [
@@ -83,8 +76,8 @@
             "spec": {
                 "ports": [
                     {
-                        "port": 8778,
-                        "targetPort": 8778
+                        "port": 8080,
+                        "targetPort": 8080
                     }
                 ],
                 "selector": {
@@ -99,12 +92,49 @@
             }
         },
         {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "id": "${APPLICATION_NAME}",
+            "metadata": {
+                "name": "${APPLICATION_NAME}",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                },
+                "annotations": {
+                    "description": "Route for application's http service."
+                }
+            },
+            "spec": {
+                "host": "${HOSTNAME_HTTP}",
+                "to": {
+                    "name": "${APPLICATION_NAME}"
+                }
+            }
+        },
+        {
             "kind": "ImageStream",
             "apiVersion": "v1",
             "metadata": {
                 "name": "${APPLICATION_NAME}",
                 "labels": {
                     "application": "${APPLICATION_NAME}"
+                }
+            }
+        },
+        {
+            "kind": "PersistentVolumeClaim",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APPLICATION_NAME}"
+            },
+            "spec": {
+                "accessModes": [
+                    "ReadWriteOnce"
+                ],
+                "resources": {
+                    "requests": {
+                        "storage": "${VOLUME_CAPACITY}"
+                    }
                 }
             }
         },
@@ -127,13 +157,12 @@
                     "contextDir": "${CONTEXT_DIR}"
                 },
                 "strategy": {
-                    "type": "Source",
-                    "sourceStrategy": {
+                    "type": "Docker",
+                    "dockerStrategy": {
                         "forcePull": true,
                         "from": {
-                          "kind": "ImageStreamTag",
-                          "namespace": "${IMAGE_STREAM_NAMESPACE}",
-                          "name": "openjdk18-openshift:${BUILDER_VERSION}"
+                            "kind": "ImageStreamTag",
+                            "name": "${BASE_IMAGESTREAMTAG}"
                         }
                     }
                 },
@@ -218,43 +247,34 @@
                                 "imagePullPolicy": "Always",
                                 "ports": [
                                     {
-                                        "name": "jolokia",
-                                        "containerPort": 8778,
+                                        "name": "web",
+                                        "containerPort": 8080,
                                         "protocol": "TCP"
                                     }
                                 ],
-		                        "env": [
-		                            {
-		                                "name": "KUBERNETES_NAMESPACE",
-		                                "valueFrom": {
-		                                    "fieldRef": {
-		                                        "apiVersion": "v1",
-		                                        "fieldPath": "metadata.namespace"
-		                                    }
-		                                }
-		                            },
-		                            {
-		                                "name": "DEVICE_ID",
-		                                "valueFrom": {
-		                                    "fieldRef": {
-		                                        "apiVersion": "v1",
-		                                        "fieldPath": "metadata.name"
-		                                    }
-		                                }
-		                            },
-		                            {
-		                                "name": "MQTT_SERVICE",
-		                                "value": "broker-amq-mqtt"
-		                            },
-		                            {
-		                                "name": "MQTT_USERNAME",
-		                                "value": "${MQTT_USERNAME}"
-		                            },
-		                            {
-		                                "name": "MQTT_PASSWORD",
-		                                "value": "${MQTT_PASSWORD}"
-		                            }
-		                        ]
+                                "readinessProbe": {
+                                    "httpGet": {
+                                        "path": "/index.html",
+                                        "port": 8080,
+                                        "scheme": "HTTP"
+                                    },
+                                    "initialDelaySeconds": 30,
+                                    "timeoutSeconds": 5
+                                },
+                                "volumeMounts": [
+                                    {
+                                        "name": "${APPLICATION_NAME}-storage",
+                                        "mountPath": "/opt/zeppelin/storage"
+                                    }
+                                ]
+                            }
+                        ],
+                        "volumes": [
+                            {
+                                "name": "${APPLICATION_NAME}-storage",
+                                "persistentVolumeClaim": {
+                                    "claimName": "${APPLICATION_NAME}"
+                                }
                             }
                         ]
                     }

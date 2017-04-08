@@ -3,48 +3,27 @@
     "apiVersion": "v1",
     "metadata": {
         "annotations": {
-            "description": "Application template for Red Hat JBoss BRMS 6.3 decision server applications built using S2I.",
-            "iconClass": "icon-jboss",
-            "tags": "decisionserver,java,jboss,xpaas",
-            "version": "1.3.3"
+            "description": "Software sensor application template.",
+            "iconClass": "icon-openjdk",
+            "tags": "java"
         },
-        "name": "decisionserver63-basic-s2i"
+        "name": "software-sensor"
     },
     "labels": {
-        "template": "decisionserver63-basic-s2i",
-        "xpaas": "1.3.3"
+        "template": "software-sensor"
     },
     "parameters": [
-        {
-            "description": "The KIE Container deployment configuration in format: containerId=groupId:artifactId:version|c2=g2:a2:v2",
-            "name": "KIE_CONTAINER_DEPLOYMENT",
-            "value": "iot-ocp-businessrules-service=com.redhat.examples.iot:iot-ocp-businessrules-service:0.0.1-SNAPSHOT",
-            "required": false
-        },
-        {
-            "description": "The user name to access the KIE Server REST or JMS interface.",
-            "name": "KIE_SERVER_USER",
-            "value": "kieserver",
-            "required": false
-        },
-        {
-            "description": "The password to access the KIE Server REST or JMS interface. Must be different than username; must not be root, admin, or administrator; must contain at least 8 characters, 1 alphabetic character(s), 1 digit(s), and 1 non-alphanumeric symbol(s).",
-            "name": "KIE_SERVER_PASSWORD",
-            "from": "[a-zA-Z]{6}[0-9]{1}!",
-            "generate": "expression",
-            "required": false
-        },
+	    {
+	        "description": "Name of the MQTT application.",
+	        "name": "MQTT_APPLICATION",
+	        "value": "broker",
+	        "required": false
+	    },
         {
             "description": "The name for the application.",
             "name": "APPLICATION_NAME",
-            "value": "kie-app",
+            "value": "software-sensor",
             "required": true
-        },
-        {
-            "description": "Custom hostname for http service route.  Leave blank for default hostname, e.g.: <application-name>-<project>.<default-domain-suffix>",
-            "name": "HOSTNAME_HTTP",
-            "value": "",
-            "required": false
         },
         {
             "description": "Git source URI for application",
@@ -61,27 +40,19 @@
         {
             "description": "Path within Git project to build; empty for root project directory.",
             "name": "CONTEXT_DIR",
-            "value": "iot-ocp-businessrules-service",
+            "value": "iot-ocp-software-sensor",
             "required": false
         },
         {
-            "description": "Queue names",
-            "name": "HORNETQ_QUEUES",
-            "value": "",
-            "required": false
+          "description": "Namespace in which the Software Sensor ImageStreams are installed. These ImageStreams are normally installed in the openshift namespace. You should only need to modify this if you've installed the ImageStreams in a different namespace/project.",
+          "name": "IMAGE_STREAM_NAMESPACE",
+          "value": "openshift",
+          "required": true
         },
         {
-            "description": "Topic names",
-            "name": "HORNETQ_TOPICS",
-            "value": "",
-            "required": false
-        },
-        {
-            "description": "HornetQ cluster admin password",
-            "name": "HORNETQ_CLUSTER_PASSWORD",
-            "from": "[a-zA-Z0-9]{8}",
-            "generate": "expression",
-            "required": true
+          "name": "BUILDER_VERSION",
+          "value": "1.0",
+          "description": "Builder version"
         },
         {
             "description": "GitHub trigger secret",
@@ -96,12 +67,6 @@
             "from": "[a-zA-Z0-9]{8}",
             "generate": "expression",
             "required": true
-        },
-        {
-            "description": "Namespace in which the ImageStreams for Red Hat Middleware images are installed. These ImageStreams are normally installed in the openshift namespace. You should only need to modify this if you've installed the ImageStreams in a different namespace/project.",
-            "name": "IMAGE_STREAM_NAMESPACE",
-            "value": "openshift",
-            "required": true
         }
     ],
     "objects": [
@@ -111,8 +76,8 @@
             "spec": {
                 "ports": [
                     {
-                        "port": 8080,
-                        "targetPort": 8080
+                        "port": 8778,
+                        "targetPort": 8778
                     }
                 ],
                 "selector": {
@@ -123,29 +88,6 @@
                 "name": "${APPLICATION_NAME}",
                 "labels": {
                     "application": "${APPLICATION_NAME}"
-                },
-                "annotations": {
-                    "description": "The web server's http port."
-                }
-            }
-        },
-        {
-            "kind": "Route",
-            "apiVersion": "v1",
-            "id": "${APPLICATION_NAME}-http",
-            "metadata": {
-                "name": "${APPLICATION_NAME}",
-                "labels": {
-                    "application": "${APPLICATION_NAME}"
-                },
-                "annotations": {
-                    "description": "Route for application's http service."
-                }
-            },
-            "spec": {
-                "host": "${HOSTNAME_HTTP}",
-                "to": {
-                    "name": "${APPLICATION_NAME}"
                 }
             }
         },
@@ -180,17 +122,11 @@
                 "strategy": {
                     "type": "Source",
                     "sourceStrategy": {
-                        "env": [
-                            {
-                                "name": "KIE_CONTAINER_DEPLOYMENT",
-                                "value": "${KIE_CONTAINER_DEPLOYMENT}"
-                            }
-                        ],
                         "forcePull": true,
                         "from": {
-                            "kind": "ImageStreamTag",
-                            "namespace": "${IMAGE_STREAM_NAMESPACE}",
-                            "name": "jboss-decisionserver63-openshift:1.3"
+                          "kind": "ImageStreamTag",
+                          "namespace": "${IMAGE_STREAM_NAMESPACE}",
+                          "name": "openjdk18-openshift:${BUILDER_VERSION}"
                         }
                     }
                 },
@@ -273,62 +209,55 @@
                                 "name": "${APPLICATION_NAME}",
                                 "image": "${APPLICATION_NAME}",
                                 "imagePullPolicy": "Always",
-                                "livenessProbe": {
-                                    "exec": {
-                                        "command": [
-                                            "/bin/bash",
-                                            "-c",
-                                            "/opt/eap/bin/livenessProbe.sh"
-                                        ]
-                                    }
-                                },
-                                "readinessProbe": {
-                                    "exec": {
-                                        "command": [
-                                            "/bin/bash",
-                                            "-c",
-                                            "/opt/eap/bin/readinessProbe.sh"
-                                        ]
-                                    }
-                                },
                                 "ports": [
                                     {
                                         "name": "jolokia",
                                         "containerPort": 8778,
                                         "protocol": "TCP"
-                                    },
-                                    {
-                                        "name": "http",
-                                        "containerPort": 8080,
-                                        "protocol": "TCP"
                                     }
                                 ],
-                                "env": [
-                                    {
-                                        "name": "KIE_CONTAINER_DEPLOYMENT",
-                                        "value": "${KIE_CONTAINER_DEPLOYMENT}"
+		                        "env": [
+		                            {
+		                                "name": "KUBERNETES_NAMESPACE",
+		                                "valueFrom": {
+		                                    "fieldRef": {
+		                                        "apiVersion": "v1",
+		                                        "fieldPath": "metadata.namespace"
+		                                    }
+		                                }
+		                            },
+		                            {
+		                                "name": "DEVICE_ID",
+		                                "valueFrom": {
+		                                    "fieldRef": {
+		                                        "apiVersion": "v1",
+		                                        "fieldPath": "metadata.name"
+		                                    }
+		                                }
+		                            },
+		                            {
+		                                "name": "MQTT_SERVICE",
+		                                "value": "${MQTT_APPLICATION}-amq-mqtt"
+		                            },
+		                            {
+                                        "name": "MQTT_USERNAME",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "amq-user",
+                                                "name": "${MQTT_APPLICATION}"
+                                            }
+                                        }
                                     },
                                     {
-                                        "name": "KIE_SERVER_USER",
-                                        "value": "${KIE_SERVER_USER}"
-                                    },
-                                    {
-                                        "name": "KIE_SERVER_PASSWORD",
-                                        "value": "${KIE_SERVER_PASSWORD}"
-                                    },
-                                    {
-                                        "name": "HORNETQ_CLUSTER_PASSWORD",
-                                        "value": "${HORNETQ_CLUSTER_PASSWORD}"
-                                    },
-                                    {
-                                        "name": "HORNETQ_QUEUES",
-                                        "value": "${HORNETQ_QUEUES}"
-                                    },
-                                    {
-                                        "name": "HORNETQ_TOPICS",
-                                        "value": "${HORNETQ_TOPICS}"
+                                        "name": "MQTT_PASSWORD",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "amq-password",
+                                                "name": "${MQTT_APPLICATION}"
+                                            }
+                                        }
                                     }
-                                ]
+		                        ]
                             }
                         ]
                     }

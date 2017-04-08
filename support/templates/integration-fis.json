@@ -5,15 +5,15 @@
   "metadata": {
     "annotations": {
       "description": "FIS Generic Template",
-      "iconClass": "icon-java"
+      "iconClass": "icon-openjdk"
     },
     "labels": {},
-    "name": "fis-generic-build"
+    "name": "integration-fis"
   },
   "parameters": [
     {
       "name": "APP_NAME",
-      "value": "fis-app",
+      "value": "integration-fis",
       "description": "Application Name"
     },
     {
@@ -57,48 +57,22 @@
       "required": true
     },
     {
-        "description": "The user name to access the KIE Server.",
-        "name": "KIE_APP_USER",
-        "value": "kieserver",
-        "required": false
+      "name": "POSTGRESQL_SECRET",
+      "required": true,
+      "value": "postgresql",
+      "description": "Name of the Postgresql Secret"
     },
     {
-        "description": "The password to access the KIE Server REST. Must be different than username; must not be root, admin, or administrator; must contain at least 8 characters, 1 alphabetic character(s), 1 digit(s), and 1 non-alphanumeric symbol(s).",
-        "name": "KIE_APP_PASSWORD",
-        "from": "[a-zA-Z]{6}[0-9]{1}!",
-        "generate": "expression",
-        "required": false
+      "name": "RULES_APP",
+      "required": true,
+      "value": "rules-brms",
+      "description": "Name of the Rules Application"
     },
     {
-        "description": "The user name to access the AMQ Server.",
-        "name": "BROKER_AMQ_USERNAME",
-        "value": "iotuser",
-        "required": false
-    },
-    {
-        "description": "The password to access the AMQ awecwe. Must be different than username; must not be root, admin, or administrator; must contain at least 8 characters, 1 alphabetic character(s), 1 digit(s), and 1 non-alphanumeric symbol(s).",
-        "name": "BROKER_AMQ_PASSWORD",
-        "from": "[a-zA-Z]{6}[0-9]{1}!",
-        "generate": "expression",
-        "required": false
-    },
-    {
-        "description": "The user name to access the PostgreSQL Server.",
-        "name": "POSTGRESQL_USER",
-        "value": "postgresiot",
-        "required": true
-    },
-    {
-        "description": "The password to access the PostgreSQL Server.",
-        "name": "POSTGRESQL_PASSWORD",
-        "value": "postgresiot",
-        "required": true
-    },
-    {
-        "description": "Name of PostgreSQL Database.",
-        "name": "POSTGRESQL_DATABASE",
-        "value": "postgresiot",
-        "required": true
+      "name": "AMQ_SECRET",
+      "required": true,
+      "value": "broker",
+      "description": "Name of the AMQ Secret"
     }
   ],
   "objects": [
@@ -286,33 +260,81 @@
                   }
                 ],
                 "env": [
+                    {
+                        "name": "APP_ID",
+                        "valueFrom": {
+                            "fieldRef": {
+                                "apiVersion": "v1",
+                                "fieldPath": "metadata.name"
+                            }
+                        }
+                    },
+                    {
+                        "name": "KIE_APP_NAME",
+                        "value": "${RULES_APP}"
+                    },
                   {
                       "name": "KIE_APP_USER",
-                      "value": "${KIE_APP_USER}"
+                      "valueFrom": {
+                          "secretKeyRef": {
+                              "key": "kie-server-user",
+                              "name": "${RULES_APP}"
+                          }
+                      }
                   },
                   {
                       "name": "KIE_APP_PASSWORD",
-                      "value": "${KIE_APP_PASSWORD}"
+                      "valueFrom": {
+                          "secretKeyRef": {
+                              "key": "kie-server-password",
+                              "name": "${RULES_APP}"
+                          }
+                      }
                   },
                   {
                       "name": "BROKER_AMQ_USERNAME",
-                      "value": "${BROKER_AMQ_USERNAME}"
+                      "valueFrom": {
+                          "secretKeyRef": {
+                              "key": "amq-user",
+                              "name": "${AMQ_SECRET}"
+                          }
+                      }
                   },
                   {
                       "name": "BROKER_AMQ_PASSWORD",
-                      "value": "${BROKER_AMQ_PASSWORD}"
+                      "valueFrom": {
+                          "secretKeyRef": {
+                              "key": "amq-password",
+                              "name": "${AMQ_SECRET}"
+                          }
+                      }
                   },
                   {
                       "name": "POSTGRESQL_USER",
-                      "value": "${POSTGRESQL_USER}"
+                      "valueFrom": {
+                          "secretKeyRef": {
+                              "key": "postgresql-user",
+                              "name": "${POSTGRESQL_SECRET}"
+                          }
+                      }
                   },
                   {
                       "name": "POSTGRESQL_PASSWORD",
-                      "value": "${POSTGRESQL_PASSWORD}"
+                      "valueFrom": {
+                          "secretKeyRef": {
+                              "key": "postgresql-password",
+                              "name": "${POSTGRESQL_SECRET}"
+                          }
+                      }
                   },
                   {
                       "name": "POSTGRESQL_DATABASE",
-                      "value": "${POSTGRESQL_DATABASE}"
+                      "valueFrom": {
+                          "secretKeyRef": {
+                              "key": "postgresql-database",
+                              "name": "${POSTGRESQL_SECRET}"
+                          }
+                      }
                   }
                 ]
               }
