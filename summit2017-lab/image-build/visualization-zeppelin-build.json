@@ -54,7 +54,7 @@
         {
             "description": "Base ImageStream Tag",
             "name": "BASE_IMAGESTREAMTAG",
-            "value": "rhel7:7.2",
+            "value": "centos:7",
             "required": true
         }
     ],
