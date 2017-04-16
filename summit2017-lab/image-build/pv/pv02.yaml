@@ -1,0 +1,15 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: pv02
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+    - ReadWriteMany
+    - ReadOnlyMany
+  hostPath:
+    path: "/var/lib/minishift/pv/pv02"
+  persistentVolumeReclaimPolicy: Recycle
+

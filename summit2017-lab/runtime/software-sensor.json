@@ -1,0 +1,165 @@
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "annotations": {
+            "description": "Software sensor application template.",
+            "iconClass": "icon-openjdk",
+            "tags": "java"
+        },
+        "name": "software-sensor"
+    },
+    "labels": {
+        "template": "software-sensor"
+    },
+    "parameters": [
+	    {
+	        "description": "Name of the MQTT application.",
+	        "name": "MQTT_APPLICATION",
+	        "value": "broker",
+	        "required": false
+	    },
+        {
+            "description": "The name for the application.",
+            "name": "APPLICATION_NAME",
+            "value": "software-sensor",
+            "required": true
+        },
+
+        {
+          "description": "Namespace in which the Software Sensor ImageStreams are installed. These ImageStreams are normally installed in the openshift namespace. You should only need to modify this if you've installed the ImageStreams in a different namespace/project.",
+          "name": "IMAGE_STREAM_NAMESPACE",
+          "value": "iot-ocp-resources",
+          "required": true
+        }
+    ],
+    "objects": [
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "spec": {
+                "ports": [
+                    {
+                        "port": 8778,
+                        "targetPort": 8778
+                    }
+                ],
+                "selector": {
+                    "deploymentConfig": "${APPLICATION_NAME}"
+                }
+            },
+            "metadata": {
+                "name": "${APPLICATION_NAME}",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                }
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APPLICATION_NAME}",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                }
+            },
+            "spec": {
+                "strategy": {
+                    "type": "Recreate"
+                },
+                "triggers": [
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "${APPLICATION_NAME}"
+                            ],
+                            "from": {
+                                "kind": "ImageStream",
+                                "name": "${APPLICATION_NAME}",
+                                "namespace": "${IMAGE_STREAM_NAMESPACE}"
+                            }
+                        }
+                    },
+                    {
+                        "type": "ConfigChange"
+                    }
+                ],
+                "replicas": 1,
+                "selector": {
+                    "deploymentConfig": "${APPLICATION_NAME}"
+                },
+                "template": {
+                    "metadata": {
+                        "name": "${APPLICATION_NAME}",
+                        "labels": {
+                            "deploymentConfig": "${APPLICATION_NAME}",
+                            "application": "${APPLICATION_NAME}"
+                        }
+                    },
+                    "spec": {
+                        "terminationGracePeriodSeconds": 60,
+                        "containers": [
+                            {
+                                "name": "${APPLICATION_NAME}",
+                                "image": "${APPLICATION_NAME}",
+                                "imagePullPolicy": "IfNotPresent",
+                                "ports": [
+                                    {
+                                        "name": "jolokia",
+                                        "containerPort": 8778,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+		                        "env": [
+		                            {
+		                                "name": "KUBERNETES_NAMESPACE",
+		                                "valueFrom": {
+		                                    "fieldRef": {
+		                                        "apiVersion": "v1",
+		                                        "fieldPath": "metadata.namespace"
+		                                    }
+		                                }
+		                            },
+		                            {
+		                                "name": "DEVICE_ID",
+		                                "valueFrom": {
+		                                    "fieldRef": {
+		                                        "apiVersion": "v1",
+		                                        "fieldPath": "metadata.name"
+		                                    }
+		                                }
+		                            },
+		                            {
+		                                "name": "MQTT_SERVICE",
+		                                "value": "${MQTT_APPLICATION}-amq-mqtt"
+		                            },
+		                            {
+                                        "name": "MQTT_USERNAME",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "amq-user",
+                                                "name": "${MQTT_APPLICATION}"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "MQTT_PASSWORD",
+                                        "valueFrom": {
+                                            "secretKeyRef": {
+                                                "key": "amq-password",
+                                                "name": "${MQTT_APPLICATION}"
+                                            }
+                                        }
+                                    }
+		                        ]
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
