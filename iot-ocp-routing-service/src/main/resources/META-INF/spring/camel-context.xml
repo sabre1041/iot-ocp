@@ -10,7 +10,7 @@
 	<!--Helper Bean to extract data from MQTT Topic and and to Message in csv values  -->
   	<bean id="myHelper" class="com.redhat.examples.iot.routingService.MyHelper" />
   	
-  	<bean id="rules" class="com.redhat.examples.iot.routingService.BusinessRulesBean" init-method="init" />
+  	<!-- bean id="rules" class="com.redhat.examples.iot.routingService.BusinessRulesBean" init-method="init" /-->
   	
   	<!-- this is the JDBC data source which uses a PostgreSQL database -->
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
@@ -54,7 +54,7 @@
 
   <route id="processRules">
   <from uri="activemqGateway:queue:message.to.rules"/>
-  <bean ref="rules" method="processRules"/>
+  <!-- bean ref="rules" method="processRules"/-->
   <choice>
   	<when>
   		<simple>${body.errorCode} != 0</simple>
