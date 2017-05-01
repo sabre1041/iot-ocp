@@ -55,6 +55,9 @@
   <route id="processRules">
   <from uri="activemqGateway:queue:message.to.rules"/>
   <!-- bean ref="rules" method="processRules"/-->
+  <unmarshal>
+  	<jaxb contextPath="com.redhat.examples.iot.routingService" />
+  </unmarshal>
   <choice>
   	<when>
   		<simple>${body.errorCode} != 0</simple>
